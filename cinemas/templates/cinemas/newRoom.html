@@ -1,0 +1,13 @@
+{% extends 'cinemas/base.html' %}
+
+{% block content %}
+
+    <p><a href="{% url 'cinema' cinema.id %}">{{ cinema }}</a></p>
+    <p>Adicione uma nova sala:</p>
+    <form action="{% url 'newRoom' cinema.id %}" method='post'>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button name="submit">Adicionar</button>
+    </form>
+
+{% endblock %}

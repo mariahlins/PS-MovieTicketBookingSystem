@@ -1,0 +1,12 @@
+{% extends 'cinemas/base.html' %}
+
+{% block content %}
+
+    <p>Editar cinema:</p>
+    <form action="{% url 'editCinema' cinema.id %}" method='post'>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button name="submit">Salvar</button>
+    </form>
+
+{% endblock %}

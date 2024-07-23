@@ -1,0 +1,18 @@
+{% extends 'cinemas/base.html' %}
+
+{% block content %}
+
+    <h2>Lista de cinemas cadastrados</h2>
+    <ul>
+        {% for cinema in cinemas %}
+        <li>
+            <a href="{% url 'cinema' cinema.id %}">{{cinema}}</a>
+            <p><a href="{% url 'editCinema' cinema.id %}">Editar cinema</a></p>
+        </li>
+        {% empty %} <li>Não há cinemas registrados</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'newCinema' %}">Adicionar novo cinema</a>
+
+{% endblock %}

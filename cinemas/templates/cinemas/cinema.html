@@ -1,0 +1,19 @@
+{% extends 'cinemas/base.html' %}
+
+{% block content %}
+
+    <h2>Cinema: {{cinema}}</h2>
+    <p><a href="{% url 'newRoom' cinemaId %}">Adicione uma nova sala</a></p>
+    <p>Salas:</p>
+    <ul>
+        {% for room in rooms %}
+        <li>
+            <h3>{{room}}</h3>
+            <p>número de assentos: {{room.seats}}</p>
+            <p><a href="{% url 'editRoom' room.id %}">Editar sala</a></p>
+        </li>
+        {% empty %} <li>Não há salas registradas</li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}

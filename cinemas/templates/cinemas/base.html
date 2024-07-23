@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Meu Projeto{% endblock %}</title>
+</head>
+<body>
+    <p>
+        {% if user.is_authenticated %}
+            olá {{user.username}}
+            <a href="{% url 'logout' %}">sair</a>
+        {% else %}
+            <a href="{% url 'login' %}">entrar</a>
+            <a href="{% url 'register' %}">registrar</a>
+        {% endif %}
+    </p>
+    {% block content %}{% endblock content %}
+</body>
+</html>
