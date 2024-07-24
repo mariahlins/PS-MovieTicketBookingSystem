@@ -1,0 +1,132 @@
+/*lexend e manrope*/
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&family=Manrope:wght@200..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Manrope:wght@200..800&display=swap');
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font: bold 14px/1.4 'Open Sans', arial, sans-serif;
+    background: #000015;
+}
+
+ul { 
+  margin: 20px auto 0; 
+  padding: 0; 
+  list-style: none; 
+  display: table;
+  width: 600px;
+  text-align: center;
+}
+
+li { 
+  display: table-cell; 
+  position: relative; 
+  padding: 15px 0;
+  color: #fff;
+  text-transform: uppercase;
+  text-decoration: none;
+  letter-spacing: 0.15em;
+}
+
+.menu {
+  color: #fff;
+  text-transform: uppercase;
+  text-decoration: none;
+  letter-spacing: 0.15em;
+  font-family: "Manrope", sans-serif;
+  display: inline-block;
+  padding: 15px 20px;
+  position: relative;
+}
+
+.menu2 {
+  color: #848282;
+  text-transform: uppercase;
+  text-decoration: none;
+  letter-spacing: 0.15em;
+  font-family: "Manrope", sans-serif;
+  display: inline-block;
+  padding: 15px 20px;
+  position: relative;
+}
+
+.menu:after {    
+  background: none repeat scroll 0 0 transparent;
+  bottom: 0;
+  content: "";
+  display: block;
+  height: 2px;
+  left: 50%;
+  position: absolute;
+  background: #fff;
+  transition: width 0.3s ease 0s, left 0.3s ease 0s;
+  width: 0;
+}
+
+.menu2:after {    
+  background: none repeat scroll 0 0 transparent;
+  bottom: 0;
+  content: "";
+  display: block;
+  height: 2px;
+  left: 50%;
+  position: absolute;
+  background: #717171;
+  transition: width 0.3s ease 0s, left 0.3s ease 0s;
+  width: 0;
+}
+
+a:hover:after { 
+  width: 100%; 
+  left: 0; 
+}
+
+@media screen and (max-height: 300px) {
+    ul {
+        margin-top: 15px;
+    }
+}
+
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.card {
+    background-color: #f2f2f6;
+    border: 1px solid #ddd;
+    border-radius: 0.6rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    width: 300px;
+    overflow: hidden;
+    padding: 1rem;
+    transition: all 0.8s cubic-bezier(0.15, 0.83, 0.66, 1);
+}
+
+.card:hover {
+    transform: scale(1.01);
+}
+
+.card a {
+    text-decoration: none;
+    color: #df217d;
+}
+
+.card a.btn {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #df217d;
+    color: #fff;
+    border-radius: 0.25rem;
+}
+
+.card a.btn:hover {
+    background-color: #df217d;
+}
+

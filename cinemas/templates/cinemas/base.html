@@ -3,18 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Meu Projeto{% endblock %}</title>
+    <meta name="description" content="CinePass - Your go-to platform for booking movie tickets.">
+    <meta name="keywords" content="movie, tickets, booking, cinema, CinePass">
+    <title>{% block title %}CinePass{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'cinemas/css/styles.css' %}">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <p>
-        {% if user.is_authenticated %}
-            olá {{user.username}}
-            <a href="{% url 'logout' %}">sair</a>
-        {% else %}
-            <a href="{% url 'login' %}">entrar</a>
-            <a href="{% url 'register' %}">registrar</a>
+    {% block header_content %}{% endblock %}
+    
+    <ul>
+        <li><a class="menu" href="{% url 'index' %}">Home</a></li>
+
+        {% if user.is_superuser or user.is_staff %}
+        <li><a class="menu" href="{% url 'cinemas' %}">Cinemas</a></li>
         {% endif %}
-    </p>
+        
+        {% if not user.is_superuser %}
+        <li><a class="menu" href="">Releases</a></li>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+            <li><a class="menu" href="pagUser">Hi, {{user.username}}!</a></li>
+            <li><a class="menu2" href="{% url 'logout' %}">Logout</a></li>
+        {% else %}
+            <li><a class="menu" href="{% url 'login' %}">Login</a></li>
+            <li><a class="menu2" href="{% url 'register' %}">Register</a></li>
+        {% endif %}
+    </ul>
+
+
     {% block content %}{% endblock content %}
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.min.js"></script>
 </body>
 </html>

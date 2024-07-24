@@ -2,17 +2,27 @@
 
 {% block content %}
 
-    <h2>Lista de cinemas cadastrados</h2>
-    <ul>
-        {% for cinema in cinemas %}
-        <li>
-            <a href="{% url 'cinema' cinema.id %}">{{cinema}}</a>
-            <p><a href="{% url 'editCinema' cinema.id %}">Editar cinema</a></p>
-        </li>
-        {% empty %} <li>Não há cinemas registrados</li>
-        {% endfor %}
-    </ul>
+<h2 style="text-align: center; color:ghostwhite; font-family: 'Lexend', sans-serif;">Todos os cinemas</h2>
 
-    <a href="{% url 'newCinema' %}">Adicionar novo cinema</a>
+<div class="container">
+    <div class="card-container">
+        {% for cinema in cinemas %}
+        <div class="card">
+            <h2><a href="{% url 'cinema' cinema.id %}">{{ cinema }}</a></h2>
+            {% if user.is_superuser %}
+            <a href="{% url 'editCinema' cinema.id %}" class="btn">Editar cinema</a>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="card">
+            <p>Não há cinemas registrados</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% if user.is_superuser %}
+    <a class="menu2" href="{% url 'newCinema' %}">Adicionar novo cinema</a>
+{% endif %}
 
 {% endblock %}

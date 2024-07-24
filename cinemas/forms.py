@@ -3,9 +3,14 @@ from .models import Cinema, Room
 
 class CinemaForm(forms.ModelForm):
     class Meta:
-        model=Cinema
-        fields=['cinemaName','state','city','rooms']
-        labels={'cinemaName':'Cinemas name', 'state':'State', 'city':'City', 'rooms':'Number of rooms'}
+        model = Cinema
+        fields = ['cinemaName', 'state', 'city', 'rooms']
+        widgets = {
+            'cinemaName': forms.TextInput(attrs={'class': 'form-control'}),
+            'state': forms.Select(attrs={'class': 'form-control'}),
+            'city': forms.TextInput(attrs={'class': 'form-control'}),
+            'rooms': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
 
 class RoomForm(forms.ModelForm):
     class Meta:

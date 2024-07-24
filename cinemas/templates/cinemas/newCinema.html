@@ -1,12 +1,32 @@
 {% extends 'cinemas/base.html' %}
 
 {% block content %}
-
-    <p>Adicione um novo cinema:</p>
-    <form action="{% url 'newCinema' %}" method='post'>
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button name="submit">Adicionar</button>
-    </form>
-    
+    <div class="container">
+        <h1 class="my-4">Adicione um novo cinema:</h1>
+        <form action="{% url 'newCinema' %}" method="post" class="form needs-validation" novalidate>
+            {% csrf_token %}
+            
+            <div class="input-span">
+                <label for="{{ form.cinemaName.id_for_label }}" class="label">Nome do Cinema</label>
+                {{ form.cinemaName }}
+            </div>
+            
+            <div class="input-span">
+                <label for="{{ form.state.id_for_label }}" class="label">Estado</label>
+                {{ form.state }}
+            </div>
+            
+            <div class="input-span">
+                <label for="{{ form.city.id_for_label }}" class="label">Cidade</label>
+                {{ form.city }}
+            </div>
+            
+            <div class="input-span">
+                <label for="{{ form.rooms.id_for_label }}" class="label">Número de Salas</label>
+                {{ form.rooms }}
+            </div>
+            
+            <button type="submit" class="submit">Adicionar</button>
+        </form>
+    </div>
 {% endblock %}

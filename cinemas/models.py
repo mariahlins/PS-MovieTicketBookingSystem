@@ -39,8 +39,7 @@ class Cinema(models.Model):
     dateAdded=models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.cinemaName} - {self.state}"
-    
+        return f"{self.cinemaName} ({self.city} - {self.state})"
 
 class Room(models.Model):
     cinema=models.ForeignKey(Cinema, on_delete=models.CASCADE)
