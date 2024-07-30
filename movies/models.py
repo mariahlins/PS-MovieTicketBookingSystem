@@ -1,3 +1,38 @@
 from django.db import models
 
-# Create your models here.
+class Genre(models.Model):
+    GENRES=[
+        ('Action','Action'),
+        ('Adventure','Adventure'),
+        ('Comedy','Comedy'),
+        ('Drama','Drama'),
+        ('Documentary','Documentary'),
+        ('Fantasy','Fantasy'),
+        ('Horror','Horror'),
+        ('Mystery','Mystery'),
+        ('Musical','Musical'),
+        ('Romance','Romance'),
+        ('Thriller','Thriller'),
+        ('Sci-Fi','Sci-fi'),
+        ('Superhero','Superhero'),
+        ('Psychological Horror','Psychological Horror'),
+    ]
+    name=models.CharField(max_length=50,choices=GENRES)
+    
+    def __str__(self):
+        return self.name
+
+class Movie(models.Model):
+    title=models.CharField(max_length=255)
+    plot=models.CharField(max_length=1000)
+    duration=models.IntegerField()
+    genre=models.ManyToManyField(Genre)
+    year=models.CharField(max_length=4)
+    director=models.CharField(max_length=100)
+    country=models.CharField(max_length=30)
+    poster = models.URLField(blank=True, null=True)
+    rating=models.IntegerField()
+    dateAdded=models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title

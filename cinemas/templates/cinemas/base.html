@@ -18,10 +18,11 @@
 
         {% if user.is_superuser or user.is_staff %}
         <li><a class="menu" href="{% url 'cinemas' %}">Cinemas</a></li>
+        <li><a class="menu" href="{% url 'movies' %}">Movies</a></li>
         {% endif %}
         
         {% if not user.is_superuser %}
-        <li><a class="menu" href="">Releases</a></li>
+        <li><a class="menu" href="{% url 'movies' %}">Releases</a></li>
         {% endif %}
 
         {% if user.is_authenticated %}

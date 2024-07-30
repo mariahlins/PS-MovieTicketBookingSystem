@@ -1,0 +1,12 @@
+{% extends 'cinemas/base.html' %}
+
+{% block content %}
+
+<h3 style="color: aliceblue;">{{movie.title}}</h3>
+<h5 style="color: antiquewhite;">{{movie.plot}}</h5>
+<h5 style="color: antiquewhite;">{{movie.duration}} min</h5>
+<img src="{{movie.poster}}">
+
+
+
+{% endblock %}
