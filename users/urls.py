@@ -6,4 +6,8 @@ urlpatterns=[
     path('login/', authViews.LoginView.as_view(template_name='users/login.html'), name='login'),
     path('logout/', views.logoutView, name='logout'),
     path('register/',views.register, name='register'),
+    path('registerStaff/',views.registerStaff, name='registerStaff'),
+    path('perfil/',views.perfilClient, name='perfilClient'),
+    path('perfilStaff/',views.perfilStaff, name='perfilStaff'),
+    path('perfilAdmin/',views.perfilAdmin, name='perfilAdmin'),
 ]

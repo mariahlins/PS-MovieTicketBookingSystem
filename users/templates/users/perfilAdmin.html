@@ -1,0 +1,13 @@
+{% extends 'cinemas/base.html' %}
+{% block content %}
+
+<div class="container">
+    <a href="{% url 'registerStaff' %}" style="color: azure;">Register Staff</a>
+    <ul style="display: grid;">
+        {% for user in users %}
+        <li>{{user}}</li>
+        {% endfor %}
+    </ul>
+</div>
+
+{% endblock content %}

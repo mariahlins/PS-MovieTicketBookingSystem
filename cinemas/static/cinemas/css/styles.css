@@ -130,3 +130,10 @@ a:hover:after {
     background-color: #df217d;
 }
 
+.container{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    
+}

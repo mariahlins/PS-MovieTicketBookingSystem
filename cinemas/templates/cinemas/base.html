@@ -25,7 +25,10 @@
         {% endif %}
 
         {% if user.is_authenticated %}
-            <li><a class="menu" href="pagUser">Hi, {{user.username}}!</a></li>
+            {%if not user.is_staff and not user.is_superuser %} <li><a class="menu" href="{% url 'perfilClient' %}">Hi, {{user.username}}!</a></li>
+            {% elif user.is_staff and not user.is_superuser %} <li><a class="menu" href="{% url 'perfilStaff' %}">Hi, {{user.username}}!</a></li>
+            {% elif user.is_superuser %} <li><a class="menu" href="{% url 'perfilAdmin' %}">Hi, {{user.username}}!</a></li>
+            {% endif %}
             <li><a class="menu2" href="{% url 'logout' %}">Logout</a></li>
         {% else %}
             <li><a class="menu" href="{% url 'login' %}">Login</a></li>
