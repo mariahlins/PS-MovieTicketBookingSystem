@@ -1,0 +1,12 @@
+{% extends 'cinemas/base.html' %}
+
+{% block content %}
+
+    <p>Editar perfil:</p>
+    <form action="" method='post'>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button name="submit">Salvar</button>
+    </form>
+
+{% endblock %}

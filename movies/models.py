@@ -1,7 +1,9 @@
 from django.db import models
 
-class Genre(models.Model):
+class Movie(models.Model):
+
     GENRES=[
+        ('None','None'),
         ('Action','Action'),
         ('Adventure','Adventure'),
         ('Comedy','Comedy'),
@@ -17,16 +19,10 @@ class Genre(models.Model):
         ('Superhero','Superhero'),
         ('Psychological Horror','Psychological Horror'),
     ]
-    name=models.CharField(max_length=50,choices=GENRES)
-    
-    def __str__(self):
-        return self.name
 
-class Movie(models.Model):
     title=models.CharField(max_length=255)
     plot=models.CharField(max_length=1000)
     duration=models.IntegerField()
-    genre=models.ManyToManyField(Genre)
     year=models.CharField(max_length=4)
     director=models.CharField(max_length=100)
     country=models.CharField(max_length=30)

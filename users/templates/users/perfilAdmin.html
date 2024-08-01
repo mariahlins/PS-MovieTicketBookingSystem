@@ -5,7 +5,10 @@
     <a href="{% url 'registerStaff' %}" style="color: azure;">Register Staff</a>
     <ul style="display: grid;">
         {% for user in users %}
-        <li>{{user}}</li>
+        <li>
+            {{user}}
+            <a href="{% url 'editStaff' user.id %}">editar usuário</a>
+        </li>
         {% endfor %}
     </ul>
 </div>

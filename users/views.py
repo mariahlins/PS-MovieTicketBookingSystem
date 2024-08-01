@@ -54,3 +54,36 @@ def registerStaff(request):
 
     context = {'form': form}
     return render(request, 'users/registerStaff.html', context)
+
+"""@login_required
+def editProfile(request, userId):
+    profile=Profile.objects.get(id=userId)
+
+    if request.method=='POST':
+        form=SignUpForm(instance=profile, data=request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('perfil'))
+    else:
+        form=SignUpForm(instance=profile)
+    
+    context={'profile':profile, 'form': form}
+    return render(request, 'users/editProfile.html', context)
+
+@login_required
+def editStaff(request, userId):
+    profile = Profile.objects.get(id=userId)
+    
+    #aqui vai copiar e apenas editar as informações sem editar a senha do funcionário
+    if request.method == 'POST':
+        post_data = request.POST.copy()
+        post_data.pop('password', None)
+        form = SignUpForm(post_data, instance=profile)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('perfilAdmin'))
+    else:
+        form = SignUpForm(instance=profile)
+
+    context = {'profile': profile, 'form': form}
+    return render(request, 'users/editStaff.html', context)"""

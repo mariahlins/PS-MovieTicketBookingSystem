@@ -1,9 +1,8 @@
 from django.shortcuts import render
-from .models import Movie, Genre
+from .models import Movie
 from .forms import MovieForm
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.contrib.auth.decorators import login_required
 
 def movies(request):
     movies=Movie.objects.order_by('title')
