@@ -10,6 +10,6 @@ urlpatterns=[
     path('perfil/',views.perfilClient, name='perfilClient'),
     path('perfilStaff/',views.perfilStaff, name='perfilStaff'),
     path('perfilAdmin/',views.perfilAdmin, name='perfilAdmin'),
-    """path('editProfile/<int:userId>',views.editProfile, name='editProfile'),
-    path('editStaff/<int:userId>',views.editStaff, name='editStaff'),"""
+    path('editProfile/<int:userId>',views.editProfile, name='editProfile'),
+    path('editStaff/<int:userId>',views.editStaff, name='editStaff'),
 ]

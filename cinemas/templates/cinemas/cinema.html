@@ -11,9 +11,10 @@
             <h3>{{room}}</h3>
             <p>número de assentos: {{room.seats}}</p>
             <p><a href="{% url 'editRoom' room.id %}">Editar sala</a></p>
+            <p><a href="{% url 'deleteRoom' room.id %}">Apagar sala</a></p>
         </li>
         {% empty %} <li>Não há salas registradas</li>
         {% endfor %}
     </ul>
-
+    <p><a href="{% url 'deleteCinema' cinemaId %}">deletar cinema</a></p>
 {% endblock %}

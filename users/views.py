@@ -55,7 +55,7 @@ def registerStaff(request):
     context = {'form': form}
     return render(request, 'users/registerStaff.html', context)
 
-"""@login_required
+@login_required
 def editProfile(request, userId):
     profile=Profile.objects.get(id=userId)
 
@@ -86,4 +86,4 @@ def editStaff(request, userId):
         form = SignUpForm(instance=profile)
 
     context = {'profile': profile, 'form': form}
-    return render(request, 'users/editStaff.html', context)"""
+    return render(request, 'users/editStaff.html', context)

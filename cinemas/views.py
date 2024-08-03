@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .models import Cinema, Room
 from .forms import CinemaForm, RoomForm
 from django.http import HttpResponseRedirect
@@ -69,7 +69,8 @@ def editCinema(request, cinemaId):
 @login_required
 def editRoom(request, roomId):
     room=Room.objects.get(id=roomId)
-    cinema= room.cinema
+    cinema_id = room.cinema.id
+    cinema = Cinema.objects.get(id=cinema_id)
 
     if request.method=='POST':
         form=RoomForm(instance=room, data=request.POST)
@@ -81,3 +82,27 @@ def editRoom(request, roomId):
     
     context={'room':room, 'cinema':cinema, 'form': form}
     return render(request, 'cinemas/editRoom.html', context)
+
+@login_required
+def deleteCinema(request, cinemaId):
+    cinema = get_object_or_404(Cinema, id=cinemaId)
+
+    if request.method == 'POST':
+        cinema.delete()
+        return HttpResponseRedirect(reverse('cinemas'))
+
+    context = {'cinema': cinema}
+    return render(request, 'cinemas/deleteCinema.html', context)
+
+@login_required
+def deleteRoom(request, roomId):
+    room = get_object_or_404(Room, id=roomId)
+
+    cinema = room.cinema
+
+    if request.method == 'POST':
+        room.delete()
+        return HttpResponseRedirect(reverse('cinema', args=[cinema.id]))
+
+    context = {'room': room, 'cinema': cinema}
+    return render(request, 'cinemas/deleteRoom.html', context)

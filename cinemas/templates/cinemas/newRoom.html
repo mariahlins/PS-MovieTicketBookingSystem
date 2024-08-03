@@ -2,9 +2,9 @@
 
 {% block content %}
 
-    <p><a href="{% url 'cinema' cinema.id %}">{{ cinema }}</a></p>
-    <p>Adicione uma nova sala:</p>
-    <form action="{% url 'newRoom' cinema.id %}" method='post'>
+    <p><a href="{% url 'cinema' cinema.id %}" style="color: aliceblue;">{{ cinema }}</a></p>
+    <p style="color: aliceblue;">Adicione uma nova sala:</p>
+    <form action="{% url 'newRoom' cinema.id %}" method='post' style="color: aliceblue;">
         {% csrf_token %}
         {{ form.as_p }}
         <button name="submit">Adicionar</button>

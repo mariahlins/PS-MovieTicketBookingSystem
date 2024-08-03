@@ -1,13 +1,13 @@
 {% extends 'cinemas/base.html' %}
 
 {% block content %}
-    <div class="container">
+    <div class="container" style="color: aliceblue;">
         <h1 class="my-4">Adicione um novo cinema:</h1>
         <form action="{% url 'newCinema' %}" method="post" class="form needs-validation" novalidate>
             {% csrf_token %}
             
             <div class="input-span">
-                <label for="{{ form.cinemaName.id_for_label }}" class="label">Nome do Cinema</label>
+                <label for="{{ form.cinemaName.id_for_label }}" class="label" style="color: aliceblue;">Nome do Cinema</label>
                 {{ form.cinemaName }}
             </div>
             
