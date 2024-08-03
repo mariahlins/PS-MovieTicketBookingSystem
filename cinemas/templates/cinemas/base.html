@@ -19,6 +19,7 @@
         {% if user.is_superuser or user.is_staff %}
         <li><a class="menu" href="{% url 'cinemas' %}">Cinemas</a></li>
         <li><a class="menu" href="{% url 'movies' %}">Movies</a></li>
+        <li><a class="menu" href="{% url 'sessions' %}">Sessions</a></li>
         {% endif %}
         
         {% if not user.is_superuser %}

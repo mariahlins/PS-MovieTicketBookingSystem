@@ -1,0 +1,26 @@
+{% extends 'cinemas/base.html' %}
+
+{% block content %}
+
+<h2 style="text-align: center; color:ghostwhite; font-family: 'Lexend', sans-serif;">Todos as sessoes</h2>
+
+<div class="container">
+    <div class="card-container">
+        {% for session in sessions %}
+        <div class="card">
+            <h2>{{ session.movie.title }}</h2>
+            <h5>{{ session.cinema }}</h5>
+        </div>
+        {% empty %}
+        <div class="card">
+            <p>Não há sessoes registradas</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% if user.is_superuser %}
+    <a class="menu2" href="{% url 'newSession' %}">Adicionar nova sessao</a>
+{% endif %}
+
+{% endblock %}

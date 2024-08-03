@@ -1,17 +1,29 @@
 from django.db import models
-from movies.models import Movie
-from cinemas.models import Room
 from users.models import Profile
+from sessoes.models import Session
 
-"""class Ticket(models.Model):
+class Ticket(models.Model):
+    TICKET_TYPES=[
+        ('MEIA', 'Meia Entrada'),
+        ('IDOSO', 'Idoso'),
+        ('NORMAL', 'Normal'),
+    ]
+
+    session = models.ForeignKey(Session, on_delete=models.CASCADE)
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
-    room = models.ForeignKey(Room, on_delete=models.SET_NULL, null=True)
-    room_name = models.CharField(max_length=100)
-    room_number = models.IntegerField()
-
+    seat_number = models.PositiveIntegerField()
+    purchased_at = models.DateTimeField(auto_now_add=True)
+    ticket_type = models.CharField(max_length=6, choices=TICKET_TYPES)
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+    
     def save(self, *args, **kwargs):
-        if self.room:
-            self.room_name = self.room.name
-            self.room_number = self.room.number
-        super().save(*args, **kwargs)"""
+        if not self.price:
+            if self.ticket_type == 'MEIA':
+                #meia entrada
+                self.price = self.session.price * 0.5 
+            elif self.ticket_type == 'IDOSO':
+                #desconto de 40% para idoso
+                self.price = self.session.price * 0.6
+            else:
+                self.price = self.session.price
+        super().save(*args, **kwargs)
