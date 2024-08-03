@@ -57,33 +57,74 @@ def registerStaff(request):
 
 @login_required
 def editProfile(request, userId):
-    profile=Profile.objects.get(id=userId)
+    profile = Profile.objects.get(id=userId)
+    user = profile.user 
 
-    if request.method=='POST':
-        form=SignUpForm(instance=profile, data=request.POST)
+    if request.method == 'POST':
+        post_data = request.POST.copy()
+        form = SignUpForm(post_data, instance=user)
+
         if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse('perfil'))
+            form.save(commit=False)
+            
+            birth_date = form.cleaned_data.get('birth_date')
+            profile.birth_date = birth_date
+            profile.save()
+            
+            return HttpResponseRedirect(reverse('perfilClient'))
     else:
-        form=SignUpForm(instance=profile)
-    
-    context={'profile':profile, 'form': form}
+        #tendo certeza de que as informações serão preenchidas
+        initial_data = {
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'username': user.username,
+            'email': user.email,
+            'birth_date': profile.birth_date,
+        }
+        form = SignUpForm(instance=user, initial=initial_data)
+
+    context = {'profile': profile, 'form': form}
     return render(request, 'users/editProfile.html', context)
+
 
 @login_required
 def editStaff(request, userId):
     profile = Profile.objects.get(id=userId)
-    
-    #aqui vai copiar e apenas editar as informações sem editar a senha do funcionário
+    user = profile.user 
+
     if request.method == 'POST':
         post_data = request.POST.copy()
-        post_data.pop('password', None)
-        form = SignUpForm(post_data, instance=profile)
+
+        if 'password' not in post_data or not post_data['password']:
+            post_data.pop('password', None)
+        
+        form = SignUpFormStaff(post_data, instance=user)
+
         if form.is_valid():
-            form.save()
+            form.save(commit=False)
+            
+            birth_date = form.cleaned_data.get('birth_date')
+            profile.birth_date = birth_date
+            profile.save()
+
+            user.is_staff = form.cleaned_data.get('is_staff')
+            user.is_superuser = form.cleaned_data.get('is_superuser')
+            user.save()
+            
             return HttpResponseRedirect(reverse('perfilAdmin'))
     else:
-        form = SignUpForm(instance=profile)
+        #tendo certeza de que as informações serão preenchidas
+        initial_data = {
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'username': user.username,
+            'email': user.email,
+            'birth_date': profile.birth_date,
+            'is_staff': user.is_staff,
+            'is_superuser': user.is_superuser,
+        }
+        form = SignUpFormStaff(instance=user, initial=initial_data)
 
     context = {'profile': profile, 'form': form}
     return render(request, 'users/editStaff.html', context)
+
