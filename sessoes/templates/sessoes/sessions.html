@@ -10,6 +10,8 @@
         <div class="card">
             <h2>{{ session.movie.title }}</h2>
             <h5>{{ session.cinema }}</h5>
+            <h3><a href="{% url 'tickets' session.id %}">tickets da sessao</a></h3>
+            <h3><a href="{% url 'deleteSession' session.id %}">deletar sessao</a></h3>
         </div>
         {% empty %}
         <div class="card">

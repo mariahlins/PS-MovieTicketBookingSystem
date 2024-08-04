@@ -3,7 +3,6 @@ from movies.models import Movie
 from cinemas.models import Room, Cinema
 
 class Session(models.Model):
-
     HOURS = [
         ('13:00', '13:00'),
         ('14:00', '14:00'),
@@ -24,7 +23,19 @@ class Session(models.Model):
     price=models.DecimalField(max_digits=6, decimal_places=2)
 
     def save(self, *args, **kwargs):
-        #aqui vai acessar o número de assentos disponiveis na sala
         if self.room:
-            self.available_seats=self.room.seats
+            self.available_seats = self.room.seats
         super().save(*args, **kwargs)
+
+    def generateTickets(self):
+        if not self.pk:
+            raise ValueError("A sessão deve ser salva antes de gerar os tickets.")
+
+        if self.room:
+            from tickets.models import Ticket
+            for seat_number in range(1, self.room.seats + 1):
+                Ticket.objects.create(
+                    session=self,
+                    seatNumber=seat_number,
+                    price=self.price
+                )

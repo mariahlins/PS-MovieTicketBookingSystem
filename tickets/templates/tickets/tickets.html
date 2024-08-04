@@ -1,0 +1,24 @@
+{% extends 'cinemas/base.html' %}
+
+{% block content %}
+<h1 style="color: aliceblue;">Ingressos para {{ session.movie.title }} - {{ session.date }}</h1>
+<div class="container">
+    <div class="card-container">
+        {% for ticket in tickets %}
+        <div class="card">
+            Assento: {{ ticket.seatNumber }}<br>
+            {% if ticket.is_reserverd %}
+            <h4 style="color: crimson;">Reservado: {{ ticket.is_reserved }}</h4>
+            <h4>{{ ticket.get_ticket_type_display }}</h4> 
+            Usuário: {% if ticket.user %}{{ ticket.user.username }}{% endif %}<br>
+            {% else %}
+            <h4 style="color: darkgreen;">
+                Reservado: {{ ticket.is_reserved }}
+            </h4>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
