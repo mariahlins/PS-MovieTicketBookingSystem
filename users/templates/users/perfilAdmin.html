@@ -8,6 +8,8 @@
         {% for user in users %}
         <li>
             {{user}}
+            <p>staff: {{user.is_staff}}</p>
+            <p>super: {{user.is_superuser}}</p>
             <a href="{% url 'editStaff' user.id %}">editar usuário</a>
         </li>
         {% endfor %}

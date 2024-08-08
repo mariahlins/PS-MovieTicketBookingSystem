@@ -7,13 +7,14 @@
         {% for ticket in tickets %}
         <div class="card">
             Assento: {{ ticket.seatNumber }}<br>
-            {% if ticket.is_reserverd %}
+            {% if ticket.is_reserved %}
             <h4 style="color: crimson;">Status: INDISPONÍVEL</h4>
+            <h4>Tipo de Ingresso: {{ ticket.get_ticketType_display }}</h4>
             {% else %}
             <h4 style="color: darkgreen;">
                 Status: DISPONÍVEL 
             </h4>
-            <a href="{% url 'change' ticket.id %}">comprar</a>
+            <a href="{% url 'sessionTicket' ticket.id %}">comprar</a>
             {% endif %}
         </div>
         {% endfor %}

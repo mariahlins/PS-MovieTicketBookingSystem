@@ -57,13 +57,12 @@ def registerStaff(request):
     return render(request, 'users/registerStaff.html', context)
 
 @login_required
-def editProfile(request, userId):
-    profile = Profile.objects.get(id=userId)
-    user = profile.user 
+def editProfile(request):
+    profile = request.user
 
     if request.method == 'POST':
         post_data = request.POST.copy()
-        form = SignUpForm(post_data, instance=user)
+        form = SignUpForm(post_data, instance=profile)
 
         if form.is_valid():
             form.save(commit=False)
@@ -75,17 +74,10 @@ def editProfile(request, userId):
             return HttpResponseRedirect(reverse('perfilClient'))
     else:
         #tendo certeza de que as informações serão preenchidas
-        initial_data = {
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'username': user.username,
-            'email': user.email,
-            'birth_date': profile.birth_date,
-        }
-        form = SignUpForm(instance=user, initial=initial_data)
+        form = SignUpForm(instance=profile)
 
     context = {'profile': profile, 'form': form}
-    return render(request, 'users/editProfile.html', context)
+    return render(request, 'users/edit.html', context)
 
 
 @login_required

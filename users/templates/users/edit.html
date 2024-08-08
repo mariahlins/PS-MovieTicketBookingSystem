@@ -3,7 +3,7 @@
 {% block content %}
 
     <p>Editar perfil:</p>
-    <form action="{% url 'editProfile' user.id %}" method='post' style="color: aliceblue;">
+    <form action="{% url 'editProfile'%}" method='post' style="color: aliceblue;">
         {% csrf_token %}
         {{ form.as_p }}
         <button name="submit">Salvar</button>

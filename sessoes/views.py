@@ -12,7 +12,6 @@ def sessions(request):
     context={'sessions':sessions}
     return render(request, 'sessoes/sessions.html', context)
 
-@staff_member_required
 def newSession(request):
     if request.method == 'POST':
         form = SessionForm(request.POST)
