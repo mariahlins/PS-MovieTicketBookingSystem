@@ -24,6 +24,7 @@ def newSession(request):
         form = SessionForm()
     return render(request, 'sessoes/newSession.html', {'form': form})
 
+@login_required
 def deleteSession(request, sessionId):
     session = get_object_or_404(Session, id=sessionId)
 
