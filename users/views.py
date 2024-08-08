@@ -5,6 +5,7 @@ from django.shortcuts import render
 from .forms import SignUpForm, SignUpFormStaff
 from django.contrib.auth.decorators import login_required
 from .models import Profile
+from tickets.models import Ticket
 
 def logoutView(request):
     logout(request)
@@ -128,3 +129,7 @@ def editStaff(request, userId):
     context = {'profile': profile, 'form': form}
     return render(request, 'users/editStaff.html', context)
 
+def myTickets(request):
+    tickets=Ticket.objects.filter(user=request.profile)
+    context = {'tickets':tickets}
+    return render(request, 'users/myTickets.html', context)

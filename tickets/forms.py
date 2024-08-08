@@ -3,5 +3,7 @@ from .models import Ticket
 
 class TicketForm(forms.ModelForm):
     class Meta:
-        model = Ticket
-        fields = ['session','user','seatNumber', 'ticketType', 'price', 'is_reserved']
+        model=Ticket
+        fields=['ticketType']
+        labels={'ticketType':'Tipo de ingresso'}
+        widgets={'ticketType': forms.Select(choices=Ticket.TICKET_TYPES)}

@@ -15,11 +15,12 @@ class Ticket(models.Model):
     ticketType = models.CharField(max_length=6, choices=TICKET_TYPES)
     price = models.DecimalField(max_digits=6, decimal_places=2)
     is_reserved = models.BooleanField(default=False)
+    paid = models.BooleanField(default=False)
     purchasedAt = models.DateTimeField(auto_now_add=True)
     
-    def reserve(self, user, ticketType):
+    def reserve(self, profile, ticketType):
         if not self.is_reserved:
-            self.user = user
+            self.user = profile
             self.is_reserved = True
             self.ticketType = ticketType
 

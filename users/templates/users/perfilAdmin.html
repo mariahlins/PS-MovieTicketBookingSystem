@@ -3,6 +3,7 @@
 
 <div class="container">
     <a href="{% url 'registerStaff' %}" style="color: azure;">Register Staff</a>
+    <a href="{% url 'myTickets' %}">confira seus tickets</a>
     <ul style="display: grid;">
         {% for user in users %}
         <li>

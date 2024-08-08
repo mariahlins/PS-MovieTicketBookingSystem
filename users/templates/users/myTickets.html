@@ -1,0 +1,22 @@
+{% extends 'cinemas/base.html' %}
+
+{% block content %}
+<h1 style="color: aliceblue;">Meus Ingressos</h1>
+<div class="container">
+    <div class="card-container">
+        {% if tickets %}
+            {% for ticket in tickets %}
+            <div class="card">
+                <h2>{{ ticket.session.movie.title }}</h2>
+                <p>Data: {{ ticket.session.date }}</p>
+                <p>Assento: {{ ticket.seatNumber }}</p>
+                <p>Tipo de Ingresso: {{ ticket.get_ticket_type_display }}</p>
+                <p>Status: {% if ticket.paid %}PAGO{% else %}NÃO PAGO{% endif %}</p>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>Você ainda não reservou nenhum ingresso.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

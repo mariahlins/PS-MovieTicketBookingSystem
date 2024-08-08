@@ -12,4 +12,5 @@ urlpatterns=[
     path('perfilAdmin/',views.perfilAdmin, name='perfilAdmin'),
     path('editProfile/<int:userId>',views.editProfile, name='editProfile'),
     path('editStaff/<int:userId>',views.editStaff, name='editStaff'),
+    path('myTickets/',views.myTickets, name='myTickets'),
 ]

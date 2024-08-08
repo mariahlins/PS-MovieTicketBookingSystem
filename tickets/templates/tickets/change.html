@@ -1,0 +1,13 @@
+{% extends 'cinemas/base.html' %}
+
+{% block content %}
+<h1 style="color: aliceblue;">Confirmar Reserva do Ingresso</h1>
+<div class="container">
+    <div class="card">
+        <h2>{{ ticket.session.movie.title }}</h2>
+        <p>Data: {{ ticket.session.date }}</p>
+        <p>Assento: {{ ticket.seatNumber }}</p>
+        <button type="submit" class="btn btn-primary">Comprar ingresso</button>
+    </div>
+</div>
+{% endblock %}

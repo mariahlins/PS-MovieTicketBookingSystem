@@ -23,7 +23,9 @@
         {% endif %}
         
         {% if not user.is_superuser %}
+        <li><a class="menu" href="{% url 'sessions' %}">Sessions</a></li>
         <li><a class="menu" href="{% url 'movies' %}">Releases</a></li>
+        <a href="{% url 'myTickets' %}">confira seus tickets</a>
         {% endif %}
 
         {% if user.is_authenticated %}

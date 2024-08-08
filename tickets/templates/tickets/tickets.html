@@ -8,13 +8,12 @@
         <div class="card">
             Assento: {{ ticket.seatNumber }}<br>
             {% if ticket.is_reserverd %}
-            <h4 style="color: crimson;">Reservado: {{ ticket.is_reserved }}</h4>
-            <h4>{{ ticket.get_ticket_type_display }}</h4> 
-            Usuário: {% if ticket.user %}{{ ticket.user.username }}{% endif %}<br>
+            <h4 style="color: crimson;">Status: INDISPONÍVEL</h4>
             {% else %}
             <h4 style="color: darkgreen;">
-                Reservado: {{ ticket.is_reserved }}
+                Status: DISPONÍVEL 
             </h4>
+            <a href="{% url 'change' ticket.id %}">comprar</a>
             {% endif %}
         </div>
         {% endfor %}
