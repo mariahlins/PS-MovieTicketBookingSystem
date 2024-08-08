@@ -1,17 +1,33 @@
 from django.db import models
-from movies.models import Movie
-from cinemas.models import Room
 from users.models import Profile
+from sessoes.models import Session
 
-"""class Ticket(models.Model):
-    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
-    room = models.ForeignKey(Room, on_delete=models.SET_NULL, null=True)
-    room_name = models.CharField(max_length=100)
-    room_number = models.IntegerField()
+class Ticket(models.Model):
+    TICKET_TYPES=[
+        ('MEIA', 'Meia Entrada'),
+        ('IDOSO', 'Idoso'),
+        ('NORMAL', 'Normal'),
+    ]
 
-    def save(self, *args, **kwargs):
-        if self.room:
-            self.room_name = self.room.name
-            self.room_number = self.room.number
-        super().save(*args, **kwargs)"""
+    session = models.ForeignKey(Session, on_delete=models.CASCADE)
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, blank=True)
+    seatNumber = models.PositiveIntegerField()
+    ticketType = models.CharField(max_length=6, choices=TICKET_TYPES)
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+    is_reserved = models.BooleanField(default=False)
+    purchasedAt = models.DateTimeField(auto_now_add=True)
+    
+    def reserve(self, user, ticketType):
+        if not self.is_reserved:
+            self.user = user
+            self.is_reserved = True
+            self.ticketType = ticketType
+
+            #descontos de tipos de entrada
+            if ticketType == 'MEIA':
+                self.price = self.session.price * 0.5
+            elif ticketType == 'IDOSO':
+                self.price = self.session.price * 0.6
+            self.save()
+        else:
+            raise ValueError("Assento já reservado.")

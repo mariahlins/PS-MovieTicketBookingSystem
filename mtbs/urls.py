@@ -6,4 +6,6 @@ urlpatterns = [
     path('', include('cinemas.urls')),
     path('users/', include('users.urls')),
     path('movies/', include('movies.urls')),
+    path('sessoes/', include('sessoes.urls')),
+    path('tickets/', include('tickets.urls')),
 ]
