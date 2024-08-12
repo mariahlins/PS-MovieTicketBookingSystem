@@ -2,9 +2,9 @@
 
 {% block content %}
 
-    <h2>Cinema: {{cinema}}</h2>
+    <h2 style="color: aliceblue;">Cinema: {{cinema}}</h2>
     <p><a href="{% url 'newRoom' cinemaId %}">Adicione uma nova sala</a></p>
-    <p>Salas:</p>
+    <p style="color: aliceblue;">Salas:</p>
     <ul>
         {% for room in rooms %}
         <li>

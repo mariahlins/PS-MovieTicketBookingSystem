@@ -12,7 +12,6 @@ def sessions(request):
     context={'sessions':sessions}
     return render(request, 'sessoes/sessions.html', context)
 
-@staff_member_required
 def newSession(request):
     if request.method == 'POST':
         form = SessionForm(request.POST)
@@ -24,7 +23,6 @@ def newSession(request):
         form = SessionForm()
     return render(request, 'sessoes/newSession.html', {'form': form})
 
-@login_required
 def deleteSession(request, sessionId):
     session = get_object_or_404(Session, id=sessionId)
 
