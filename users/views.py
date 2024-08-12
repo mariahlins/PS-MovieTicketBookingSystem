@@ -5,7 +5,7 @@ from django.shortcuts import render
 from .forms import SignUpForm, SignUpFormStaff
 from django.contrib.auth.decorators import login_required
 from .models import Profile
-from tickets.models import Ticket
+from django.db import IntegrityError
 
 def logoutView(request):
     logout(request)
@@ -29,11 +29,15 @@ def register(request):
     if request.method=='POST':
         form=SignUpForm(data=request.POST)
         if form.is_valid():
-            newUser=form.save()
-            """faz o login do usuario e redireciona para a pag inicial"""
-            authenticatedUser=authenticate(username=newUser.username, password=request.POST['password'])
-            login(request, authenticatedUser)
-            return HttpResponseRedirect(reverse('index'))
+            try:
+                newUser=form.save()
+                authenticatedUser=authenticate(username=newUser.username, password=request.POST['password'])
+                login(request, authenticatedUser)
+                return HttpResponseRedirect(reverse('index'))
+            except IntegrityError:
+                form.add_error(None, "Erro ao criar o usuário. Dados duplicados ou violação de integridade.")
+            except Exception as e:
+                form.add_error(form.add_error(None, f"Erro inesperado: {e}"))
     else:
         form=SignUpForm()
 
@@ -48,8 +52,13 @@ def registerStaff(request):
     if request.method == 'POST':
         form = SignUpFormStaff(data=request.POST)
         if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse('index'))
+            try:
+                form.save()
+                return HttpResponseRedirect(reverse('index'))
+            except IntegrityError:
+                form.add_error(None, "Erro ao criar o funcionário. Dados duplicados ou violação de integridade")
+            except Exception as e:
+                form.add_error(None, f"Erro inesperado: {e}")
     else:
         form = SignUpFormStaff()
 
@@ -65,13 +74,16 @@ def editProfile(request):
         form = SignUpForm(post_data, instance=profile)
 
         if form.is_valid():
-            form.save(commit=False)
-            
-            birth_date = form.cleaned_data.get('birth_date')
-            profile.birth_date = birth_date
-            profile.save()
-            
-            return HttpResponseRedirect(reverse('perfilClient'))
+            try:
+                form.save(commit=False)
+                birth_date = form.cleaned_data.get('birth_date')
+                profile.birth_date = birth_date
+                profile.save()
+                return HttpResponseRedirect(reverse('perfilClient'))
+            except IntegrityError:
+                form.add_error(None, "Erro ao editar perfil. Dados duplicados ou violação de integridade.")
+            except Exception as e:
+                form.add_error(None, f"Erro inesperado: {e}")
     else:
         #tendo certeza de que as informações serão preenchidas
         form = SignUpForm(instance=profile)
@@ -106,17 +118,21 @@ def editStaff(request, userId):
             
             return HttpResponseRedirect(reverse('perfilAdmin'))
     else:
-        #tendo certeza de que as informações serão preenchidas
-        initial_data = {
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'username': user.username,
-            'email': user.email,
-            'birth_date': profile.birth_date,
-            'is_staff': user.is_staff,
-            'is_superuser': user.is_superuser,
-        }
-        form = SignUpFormStaff(instance=user, initial=initial_data)
+        try:
+            #tendo certeza de que as informações serão preenchidas
+            initial_data = {
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'username': user.username,
+                'email': user.email,
+                'birth_date': profile.birth_date,
+                'is_staff': user.is_staff,
+                'is_superuser': user.is_superuser,
+            }
+            form = SignUpFormStaff(instance=user, initial=initial_data)
+        except Exception as e:
+            form = SignUpFormStaff()
+            form.add_error(None, f"Erro ao carregar os dados do usuário: {e}")
 
     context = {'profile': profile, 'form': form}
     return render(request, 'users/editStaff.html', context)

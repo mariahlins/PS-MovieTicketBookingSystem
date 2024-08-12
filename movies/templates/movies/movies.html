@@ -3,14 +3,18 @@
 {% block content %}
 
 <h2 style="text-align: center; color:ghostwhite; font-family: 'Lexend', sans-serif;">Todos os filmes</h2>
-
-{% for movie in movies %}
-    <h2><a href="{% url 'movie' movie.id %}" style="color: azure;">{{movie}}</a></h2>
-{% empty %}
-<div class="card">
-    <p>Não há filmes registrados</p>
+<div class="movies-screen">
+    {% for movie in movies %}
+    <div>
+        <h2><a href="{% url 'movie' movie.id %}" style="color: azure;">{{movie}}</a></h2>
+        <img src="{{movie.poster}}">
+    </div>
+    {% empty %}
+    <div class="card">
+        <p>Não há filmes registrados</p>
+    </div>
+    {% endfor %}
 </div>
-{% endfor %}
 
 {% if user.is_superuser or user.is_staff %}
     <a class="menu2" href="{% url 'newmovie' %}">Adicionar novo filme</a>
