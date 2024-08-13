@@ -11,9 +11,11 @@
             {% if ticket.is_reserved %}
             <h4 style="color: crimson;">Status: INDISPONÍVEL</h4>
             <h4>Tipo de Ingresso: {{ ticket.get_ticketType_display }}</h4>
+            {{ticket.status}}
             {% else %}
             <h4 style="color: darkgreen;">
                 Status: DISPONÍVEL 
+                {{ticket.status}}
             </h4>
             <a href="{% url 'sessionTicket' ticket.id %}">comprar</a>
             {% endif %}
