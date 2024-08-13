@@ -2,6 +2,8 @@
 from django import forms
 from django.contrib.auth.models import User
 from .models import Profile
+from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 class SignUpForm(forms.ModelForm):
     first_name = forms.CharField(
@@ -35,6 +37,12 @@ class SignUpForm(forms.ModelForm):
         model = User
         fields = ('first_name', 'last_name', 'username', 'password', 'email', 'birth_date')
 
+    def clean_birth_date(self):
+        birth_date = self.cleaned_data.get('birth_date')
+        if birth_date and birth_date > timezone.now().date():
+            raise ValidationError("Data de nascimento inválida")
+        return birth_date
+    
     def save(self, commit=True):
         user = super(SignUpForm, self).save(commit=False)
         user.set_password(self.cleaned_data['password'])
@@ -43,6 +51,7 @@ class SignUpForm(forms.ModelForm):
             profile = Profile(user=user, birth_date=self.cleaned_data['birth_date'])
             profile.save()
         return user
+    
 
 class SignUpFormStaff(forms.ModelForm):
     first_name = forms.CharField(max_length=30, required=True)
