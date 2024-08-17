@@ -30,6 +30,7 @@ class Movie(models.Model):
     country=models.CharField(max_length=30)
     poster = models.URLField(blank=True, null=True)
     rating=models.IntegerField()
+    trailer_url = models.URLField(blank=True, null=True)
     dateAdded=models.DateField(auto_now_add=True)
 
     def __str__(self):

@@ -5,9 +5,24 @@
 <h2 style="text-align: center; color:ghostwhite; font-family: 'Lexend', sans-serif;">Todos os filmes</h2>
 <div class="movies-screen">
     {% for movie in movies %}
-    <div>
-        <h2><a href="{% url 'movie' movie.id %}" style="color: azure;">{{movie}}</a></h2>
-        <img src="{{movie.poster}}">
+    <div class="main_card">
+        <div class="card_left">
+            <div class="card_details">
+                <h1><a href="{% url 'movie' movie.id %}">{{movie.title}}</a></h1>
+                <p class="disc">{{movie.plot}}</p>
+                <a href="{% url 'movie' movie.id %}"  target="_blank">Read More</a>
+                <div class="card_cat">
+                    <p class="year">{{movie.year}}</p>
+                    <p class="genre">{{movie.genre1}}</p>
+                    <p class="time">{{movie.duration}} minutos</p>
+                </div>
+            </div>
+        </div>
+        <div class="card_right">
+            <div class="img_container">
+                <a href="{% url 'movie' movie.id %}"><img src="{{movie.poster}}"></a>
+            </div>
+        </div>
     </div>
     {% empty %}
     <div class="card">
