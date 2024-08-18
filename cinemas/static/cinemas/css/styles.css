@@ -21,7 +21,7 @@ ul {
   text-align: center;
 }
 
-li { 
+li{ 
   display: table-cell; 
   position: relative; 
   padding: 15px 0;
@@ -29,6 +29,14 @@ li {
   text-transform: uppercase;
   text-decoration: none;
   letter-spacing: 0.15em;
+}
+
+th, td, h1 { 
+  display: table-cell; 
+  position: relative; 
+  padding: 15px 0;
+  color: #fff;
+  text-decoration: none;
 }
 
 .menu {

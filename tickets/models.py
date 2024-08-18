@@ -2,6 +2,7 @@ from django.db import models
 from users.models import Profile
 from sessoes.models import Session
 from decimal import Decimal
+from django.utils import timezone
 
 class Ticket(models.Model):
     TICKET_STATUS=[
@@ -26,6 +27,7 @@ class Ticket(models.Model):
     is_reserved = models.BooleanField(default=False)
     paid = models.BooleanField(default=False)
     purchasedAt = models.DateTimeField(auto_now_add=True)
+    history = models.TextField(null=True, blank=True)
     
     def reserve(self, profile, ticketType):
         if not self.is_reserved:
@@ -33,6 +35,8 @@ class Ticket(models.Model):
             self.is_reserved = True
             self.ticketType = ticketType
             basePrice=self.price
+            if self.status=='FREE':
+                self.status = 'PENDING'
 
             #descontos de tipos de entrada
             if ticketType == 'MEIA':
@@ -43,6 +47,42 @@ class Ticket(models.Model):
         else:
             raise ValueError("Assento já reservado.")
         
+    def cancel(self):
+        if self.is_reserved:
+            TicketCancelled.objects.create(
+                original_ticket_id=self.id,
+                session=self.session,
+                user=self.user,
+                seatNumber=self.seatNumber,
+                ticketType=self.ticketType,
+                price=self.price,
+                purchasedAt=self.purchasedAt,
+                cancelledAt=timezone.now()
+            )
+            
+            self.user = None
+            self.status = 'FREE'
+            self.is_reserved = False
+            self.paid = False
+            self.save()
+        else:
+            raise ValueError("O ticket não pode ser cancelado.")
+        
+
+class TicketCancelled(models.Model):
+    original_ticket_id = models.PositiveIntegerField()
+    session = models.ForeignKey(Session, on_delete=models.CASCADE)
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    seatNumber = models.PositiveIntegerField()
+    ticketType = models.CharField(max_length=6)
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+    purchasedAt = models.DateTimeField()
+    cancelledAt = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"Ticket Cancelado - ID Original: {self.original_ticket_id}"
+
+
 class Payment(models.Model):
 
     PAYMENT_METHODS = [

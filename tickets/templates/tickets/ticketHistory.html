@@ -1,0 +1,61 @@
+{% extends 'cinemas/base.html' %}
+{% block content %}
+
+<h1>Todos os Meus Tickets</h1>
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    
+    {% if tickets %}
+    <table>
+        <thead>
+            <tr>
+                <th>Número do Assento</th>
+                <th>Tipo de Ticket</th>
+                <th>Status</th>
+                <th>Preço</th>
+                <th>Data da Compra</th>
+                <th>Data da Sessão</th>
+                <th>Cancelado em</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket in tickets %}
+                    <tr>
+                        <td>{{ ticket.seatNumber }}</td>
+                        <td>{{ ticket.ticketType }}</td>
+                        <td>{{ ticket.get_status_display }}</td>
+                        <td>{{ ticket.price }}</td>
+                        <td>{{ ticket.purchasedAt }}</td>
+                        <td>{{ ticket.session.date }}</td>
+                        <td>
+                            {% if ticket.status == 'CANCELLED' %}
+                                {{ ticket.cancelledAt|date:"d/m/Y H:i" }}
+                            {% else %}
+                                Não Cancelado
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if ticket.status == 'PENDING' %}
+                                <form action="{% url 'cancelTicket' ticket.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit">Cancelar Ticket</button>
+                                </form>
+                            {% else %}
+                                Não disponível
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Você não possui tickets.</p>
+    {% endif %}
+
+{% endblock content %}

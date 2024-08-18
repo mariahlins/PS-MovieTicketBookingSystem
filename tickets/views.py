@@ -1,11 +1,13 @@
-from django.shortcuts import render, get_object_or_404
-from .models import Ticket, Session
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Ticket, Session, TicketCancelled
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from users.models import Profile
 from .forms import TicketForm
 from django.db import IntegrityError
+from django.contrib import messages
+import json
 
 def index(request):
     return render(request, 'cinemas/index.html')
@@ -42,3 +44,45 @@ def sessionTicket(request, ticketId):
         form = TicketForm(instance=ticket)
     context = {'ticket': ticket, 'form': form}
     return render(request, 'tickets/sessionTicket.html', context)
+
+def ticketHistory(request):
+    try:
+        tickets = Ticket.objects.filter(user=request.user.profile).order_by('-purchasedAt')
+        ticketsc = TicketCancelled.objects.filter(user=request.user.profile).order_by('-cancelledAt')
+    except Ticket.DoesNotExist:
+        return HttpResponseNotFound("Ticket não encontrado")
+    return render(request, 'tickets/ticketHistory.html', {'tickets': tickets, 'ticketsc':ticketsc})
+
+
+def activeTickets(request):
+    try:
+        active_tickets = Ticket.objects.filter(user=request.user.profile, status__in=['PENDING', 'DONE'])
+    except Ticket.DoesNotExist:
+        return HttpResponseNotFound("Ticket não encontrado")
+    return render(request, 'tickets/activeTickets.html', {'active_tickets': active_tickets})
+
+
+def cancelledTicket(request):
+    try:
+        ticket_cancelled = TicketCancelled.objects.filter(user=request.user.profile)
+    except Ticket.DoesNotExist:
+        return HttpResponseNotFound("Ticket não encontrado")
+    
+    return render(request, 'tickets/cancelledTicket.html', {'ticket_cancelled': ticket_cancelled})
+
+def cancelTicket(request, ticket_id):
+    try:
+        ticket = Ticket.objects.get(id=ticket_id)
+    except Ticket.DoesNotExist:
+        return HttpResponseNotFound("Ticket não encontrado")
+    
+    if ticket.user == request.user.profile:
+        try:
+            ticket.cancel()
+            messages.success(request, 'Ticket cancelado com sucesso!')
+        except ValueError as e:
+            messages.error(request, str(e))
+    else:
+        messages.error(request, 'Você não tem permissão para cancelar este ticket.')
+
+    return redirect('ticketHistory')

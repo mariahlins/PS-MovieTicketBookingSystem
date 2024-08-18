@@ -1,7 +1,7 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.urls import reverse
 from django.contrib.auth import logout, login, authenticate
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .forms import SignUpForm, SignUpFormStaff
 from django.contrib.auth.decorators import login_required
 from .models import Profile
@@ -94,7 +94,10 @@ def editProfile(request):
 
 @login_required
 def editStaff(request, userId):
-    profile = Profile.objects.get(id=userId)
+    try:
+        profile = Profile.objects.get(id=userId)
+    except Profile.DoesNotExist:
+        return HttpResponseNotFound("Usuário não encontrado")
     user = profile.user 
 
     if request.method == 'POST':

@@ -1,0 +1,30 @@
+{% extends 'cinemas/base.html' %}
+{% block content %}
+
+<h1>Histórico de Tickets Cancelados</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Número do Assento</th>
+                <th>Tipo de Ticket</th>
+                <th>Preço</th>
+                <th>Data da Compra</th>
+                <th>Data do Cancelamento</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in ticket_cancelled %}
+                <tr>
+                    <td>{{ ticket.seatNumber }}</td>
+                    <td>{{ ticket.ticketType }}</td>
+                    <td>{{ ticket.price }}</td>
+                    <td>{{ ticket.purchasedAt }}</td>
+                    <td>{{ ticket.cancelledAt }}</td>
+                </tr>
+        </tbody>
+    </table>
+    {% empty%}
+    <p>Você não possui tickets cancelados.</p>
+    {% endfor %}
+
+{% endblock content %}
