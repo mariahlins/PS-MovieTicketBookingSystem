@@ -3,31 +3,14 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.urls import reverse
 from .models import Session
-from .forms import SessionForm
-from django.db import IntegrityError
+from .forms import FirstStepForm, SecondStepForm
+
 
 @login_required
 def sessions(request):
     sessions=Session.objects.order_by('date')
     context={'sessions':sessions}
     return render(request, 'sessoes/sessions.html', context)
-
-@login_required
-def newSession(request):
-    if request.method == 'POST':
-        form = SessionForm(request.POST)
-        if form.is_valid():
-            try:
-                newSession=form.save()
-                newSession.generateTickets()
-                return redirect('sessions')
-            except IntegrityError:
-                form.add_error(None,"Erro ao salvar. Dados duplicados ou violação de integridade")
-            except Exception as e:
-                    form.add_error(None, f"Erro inesperado: {e}")
-    else:
-        form = SessionForm()
-    return render(request, 'sessoes/newSession.html', {'form': form})
 
 def deleteSession(request, sessionId):
     try:
@@ -41,3 +24,37 @@ def deleteSession(request, sessionId):
 
     context = {'session': session}
     return render(request, 'sessoes/deleteSession.html', context)
+
+@login_required
+def newSessionStep1(request):
+    if request.method == 'POST':
+        form = FirstStepForm(request.POST)
+        if form.is_valid():
+            request.session['movie_id'] = form.cleaned_data['movie'].id
+            request.session['cinema_id'] = form.cleaned_data['cinema'].id
+            return redirect('new_session_step2')
+    else:
+        form = FirstStepForm()
+    return render(request, 'sessoes/newSessionStep1.html', {'form': form})
+
+@login_required
+def newSessionStep2(request):
+    movie_id = request.session.get('movie_id')
+    cinema_id = request.session.get('cinema_id')
+
+    if not movie_id or not cinema_id:
+        return redirect('new_session_step1')
+
+    if request.method == 'POST':
+        form = SecondStepForm(request.POST, cinema_id=cinema_id)
+        if form.is_valid():
+            session = form.save(commit=False)
+            session.movie_id = movie_id
+            session.cinema_id = cinema_id
+            session.save()
+            session.generateTickets()
+            return redirect('sessions')
+    else:
+        form = SecondStepForm(cinema_id=cinema_id)
+    
+    return render(request, 'sessoes/newSessionStep2.html', {'form': form})

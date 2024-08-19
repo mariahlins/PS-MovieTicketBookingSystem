@@ -1,0 +1,12 @@
+{% extends 'cinemas/base.html' %}
+
+{% block content %}
+
+    <p>Adicione uma nova sessao:</p>
+    <form action="{% url 'new_session_step2' %}" method='post' style="color: aliceblue;">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button name="submit">Adicionar</button>
+    </form>
+
+{% endblock %}
