@@ -22,6 +22,9 @@ class Session(models.Model):
     available_seats=models.PositiveIntegerField(default=0)
     price=models.DecimalField(max_digits=6, decimal_places=2)
 
+    class Meta:
+        unique_together = ('room', 'date', 'hour')
+
     def save(self, *args, **kwargs):
         if self.room:
             self.available_seats = self.room.seats
