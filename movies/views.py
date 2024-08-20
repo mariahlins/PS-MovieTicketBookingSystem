@@ -51,6 +51,7 @@ def deleteMovie(request, movieId):
     context = {'movie': movie}
     return render(request, 'movies/deleteMovie.html', context)
 
+@login_required
 def editMovie(request, movieId):
     try:
         movie=Movie.objects.get(id=movieId)

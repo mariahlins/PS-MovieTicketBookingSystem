@@ -3,10 +3,10 @@
 {% block content %}
 
     <p>Adicione uma nova sessao:</p>
-    <form action="{% url 'newSession' %}" method='post' style="color: aliceblue;">
+    <form action="{% url 'edit_session_step1' session.id %}" method='post' style="color: aliceblue;">
         {% csrf_token %}
         {{ form.as_p }}
-        <button name="submit">Adicionar</button>
+        <button name="step1">Adicionar</button>
     </form>
 
 {% endblock %}
