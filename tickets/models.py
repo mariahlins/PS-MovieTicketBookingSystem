@@ -88,7 +88,6 @@ class Payment(models.Model):
     PAYMENT_METHODS = [
         ('CREDIT_CARD', 'Cartão de Crédito'),
         ('DEBIT_CARD', 'Cartão de Débito'),
-        ('PAYPAL', 'PayPal'),
         ('PIX', 'PIX'),
         ('BOLETO', 'Boleto Bancário'),
     ]
