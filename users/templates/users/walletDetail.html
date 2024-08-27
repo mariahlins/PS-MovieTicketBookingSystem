@@ -1,0 +1,19 @@
+{% extends 'cinemas/base.html' %}
+{% block content %}
+
+<h1 style="color: aliceblue;">Detalhes da Wallet</h1>
+<p style="color: aliceblue;">Saldo: R$ {{ wallet.balance }}</p>
+
+<h2>Cartões de Crédito</h2>
+<ul>
+    <li>Sem cartões de crédito cadastrados.</li>
+</ul>
+
+<h2>Cartões de Débito</h2>
+<ul>
+    <li>Sem cartões de débito cadastrados.</li>
+</ul>
+
+<a href="{% url 'recharge' %}">Recarregar Saldo</a>
+
+{% endblock content %}

@@ -35,7 +35,7 @@ class SecondStepForm(forms.ModelForm):
             now = timezone.now()
             session_datetime = timezone.make_aware(datetime.combine(date, time(int(hour.split(':')[0]), int(hour.split(':')[1]))))
             if session_datetime <= now:
-                raise ValidationError("A data e hora da sessão devem ser no futuro.")
+                raise ValidationError("Informações de data ou hora inválidas")
 
             # Verificar se já existe uma sessão com a mesma sala, data e hora
             if room and Session.objects.filter(room=room, date=date, hour=hour).exists():

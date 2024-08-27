@@ -4,8 +4,12 @@ from django.contrib.auth import logout, login, authenticate
 from django.shortcuts import render, redirect
 from .forms import SignUpForm, SignUpFormStaff
 from django.contrib.auth.decorators import login_required
-from .models import Profile
+from django.contrib import messages
+from .models import Profile, Wallet
+from tickets.models import Payment
 from django.db import IntegrityError
+from decimal import Decimal
+import uuid
 
 def logoutView(request):
     logout(request)
@@ -139,3 +143,41 @@ def editStaff(request, userId):
 
     context = {'profile': profile, 'form': form}
     return render(request, 'users/editStaff.html', context)
+
+
+#wallet
+
+def recharge(request):
+    if request.method=='POST':
+        amount=Decimal(request.POST.get('amount'))
+
+        if amount>0:
+            #verifica se a carteira existe, se não existir, cria uma nova para o usuário
+            wallet, created= Wallet.objects.get_or_create(profile=request.user.profile)
+            
+            #uuid serve para gerar um id único para a transação
+            transaction_id=str(uuid.uuid4())
+
+            payment=Payment.objects.create(
+                ticket=None, #é none pq é uma recarga e não de fato uma compra
+                amount=amount,
+                payMethod='PIX',
+                status='COMPLETED',
+                transactionId=transaction_id
+            )
+
+            wallet.add_balance(amount)
+            messages.success(request, f"A quantia de R$ {amount} foi adicionada com sucesso à sua carteira via PIX!")
+            return redirect('walletDetail')
+        else:
+            messages.error(request, "Valor inválido.")
+    
+    return render(request, 'users/recharge.html')
+
+def walletDetail(request):
+    try:
+        wallet=Wallet.objects.get(profile=request.user.profile)
+    except Wallet.DoesNotExist:
+        return HttpResponseNotFound("Carteira não encontrada. Tente novamente.")
+    
+    return render(request, 'users/walletDetail.html', {'wallet':wallet})

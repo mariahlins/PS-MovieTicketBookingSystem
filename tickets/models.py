@@ -99,7 +99,7 @@ class Payment(models.Model):
         ('REFUNDED', 'Reembolsado'),
     ]
 
-    ticket=models.ForeignKey(Ticket, on_delete=models.CASCADE)
+    ticket=models.ForeignKey(Ticket, on_delete=models.CASCADE, null=True, blank=True)
     amount=models.DecimalField(max_digits=6, decimal_places=2)
     payMethod=models.CharField(max_length=20, choices=PAYMENT_METHODS)
     status=models.CharField(max_length=10, choices=PAYMENT_STATUS_CHOICES, default='PENDING')

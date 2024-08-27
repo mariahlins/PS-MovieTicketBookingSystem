@@ -27,12 +27,17 @@
                     </tr>
                     <td>
                         {% if ticket.status == 'PENDING' %}
-                            <form action="{% url 'cancelTicket' ticket.id %}" method="post">
+                            <form action="{% url 'payTicket' ticket.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit">Pagar Ticket</button>
+                            </form>
+
+                            <!--<form action="{% url 'cancelTicket' ticket.id %}" method="post">
                                 {% csrf_token %}
                                 <button type="submit">Cancelar Ticket</button>
-                            </form>
+                            </form>-->
                         {% else %}
-                            Não disponível
+                            Botão de refunding
                         {% endif %}
                     </td>
                 {% endfor %}
