@@ -1,12 +1,34 @@
 {% extends 'cinemas/base.html' %}
 {% block content %}
-    
-<h2 style="color: aliceblue;">CLIENT</h2>
-<a href="{% url 'editProfile' %}">editar perfil</a>
-<a href="{% url 'ticketHistory' %}">todos os tickets</a>
-<a href="{% url 'activeTickets' %}">tickets ativos</a>
-<a href="{% url 'cancelledTicket' %}">tickets cancelados</a>
-<a href="{% url 'walletDetail' %}">Carteira</a>
-<a href="{% url 'recharge' %}">Recarregar Saldo</a>
+
+<div class="perfil">
+    <div class="submenu">
+        <h1>Profile</h1>
+        <button class="buttonperfil">
+            <a href="{% url 'editProfile' %}">Editar Perfil</a>
+        </button>
+    </div>
+    <div class="submenu">
+        <h1>Tickets</h1>
+        <button class="buttonperfil">
+            <a href="{% url 'activeTickets' %}">Tickets ativos</a><br>
+        </button>
+        <button class="buttonperfil">
+            <a href="{% url 'ticketHistory' %}">Histórico</a><br>
+        </button>
+        <button class="buttonperfil">
+            <a href="{% url 'cancelledTicket' %}">Tickets Cancelados</a>
+        </button>
+    </div>
+    <div class="submenu">
+        <h1>Wallet</h1>
+        <button class="buttonperfil">
+            <a href="{% url 'walletDetail' %}">Carteira</a><br>
+        </button>
+        <button class="buttonperfil">
+            <a href="{% url 'recharge' %}">Recarregar Saldo</a>
+        </button>
+    </div>
+</div>
 
 {% endblock content %}

@@ -271,19 +271,6 @@ button:hover {
 	        transform: scale(1.1);
 }
 
-.fa-play-circle {
-	color: #255;
-	font-size: 160px;
-	margin-top: 110px;
-	-webkit-animation: bounce 1.0s -0.4s infinite;
-	        animation: bounce 1.0s -0.4s infinite;
-}
-
-.fa-play-circle:hover {
-	color: aqua;
-	animation: bounce 0.4s infinite;
-}
-
 @-webkit-keyframes bounce {
 	8% {
 		transform: scale(0.8);
@@ -304,4 +291,164 @@ button:hover {
 		transform: scale(2);
 		opacity: 0;
 	}
+}
+
+.noscroll{
+  overflow: hidden;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-box {
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+  width: 70%;
+  max-width: 280px;
+  text-align: center;
+}
+
+.login-box h2 {
+  margin-bottom: 20px;
+  font-family: Manrope, sans-serif;
+  color: #f2f6fa;
+}
+
+.login-btn {
+  background-color: #242a96;
+  color: #ddd;
+  padding: 10px 35px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-family: Arial, sans-serif;
+  transition: 200ms ease-in-out;
+}
+
+.login-btn:hover {
+  background-color: #10167b;
+  color: white;
+}
+
+.loginform {
+  --clr-alpha: #26223f60;
+  --bg-dark: #595860;
+  --bg-light: #efefef;
+  --clr: #242a96;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 300px;
+}
+
+.loginform input[type="text"],
+.loginform input[type="password"],
+.loginform input[type="email"],
+.loginform input[type="date"] {
+  border-radius: 0.5rem;
+  padding: 1rem 0.75rem;
+  width: 100%;
+  border: none;
+  background-color: var(--clr-alpha);
+  outline: 2px solid var(--bg-dark);
+}
+
+.loginform input[type="text"]:focus,
+.loginform input[type="password"]:focus {
+  outline: 2px solid var(--clr);
+}
+
+.loginform label {
+  align-self: flex-start;
+  color: #f2f2f6;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.span {
+  text-decoration: none;
+  color: var(--bg-dark);
+}
+
+.span a {
+  color: #373dab;
+}
+
+.perfil{
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.perfil h1{
+  color: #f2f2f6;
+  display: flex;
+  justify-content: center;
+}
+
+.submenu{
+  display: flex;
+  flex-direction: column;
+}
+
+.submenu a{
+  align-items: center;
+  text-decoration: none;
+  color: #ddd;
+  transition: 150ms ease-in-out;
+}
+
+.submenu a:hover{
+  color: white;
+}
+
+.buttonperfil {
+  width: 14em;
+  position: relative;
+  height: 4em;
+  border: 3px ridge #760157;
+  outline: none;
+  background-color: transparent;
+  color: white;
+  transition: 1s;
+  border-radius: 0.3em;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.buttonperfil::after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 3%;
+  width: 95%;
+  height: 40%;
+  background-color: #000015;
+  transition: 0.3s;
+  transform-origin: center;
+}
+
+.buttonperfil::before {
+  content: "";
+  transform-origin: center;
+  position: absolute;
+  top: 80%;
+  left: 3%;
+  width: 95%;
+  height: 40%;
+  background-color: #000015;
+  transition: 0.2s;
+}
+
+.buttonperfil:hover::before, button:hover::after {
+  transform: scale(0)
+}
+
+.buttonperfil:hover {
+  box-shadow: inset 0px 0px 15px #4b012b;
 }

@@ -1,11 +1,18 @@
 {% extends 'cinemas/base.html' %}
 {% block content %}
 
-    <form action="{% url 'login' %}" method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button name="submit">entrar</button>
-        <input type="hidden" name="next" value="{% url 'index' %}" />
-    </form>
+<div class="login-container">
+    <div class="login-box">
+        <div class="loginform">
+            <form action="{% url 'login' %}" method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="login-btn">Enter</button><br>
+                <input type="hidden" name="next" value="{% url 'index' %}" />
+            </form>
+            <span class="span">Dont have an account? <a href="{% url 'register' %}">Sign up</a></span>
+        </div>
+    </div>
+</div>
 
 {% endblock content %}
