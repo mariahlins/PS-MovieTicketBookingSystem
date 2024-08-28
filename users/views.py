@@ -180,8 +180,10 @@ def walletDetail(request):
         wallet=Wallet.objects.get(profile=request.user.profile)
     except Wallet.DoesNotExist:
         return HttpResponseNotFound("Carteira não encontrada. Tente novamente.")
+    credit_cards = wallet.credit_cards.all()
+    debit_cards = wallet.debit_cards.all()
     
-    return render(request, 'users/walletDetail.html', {'wallet':wallet})
+    return render(request, 'users/walletDetail.html', {'wallet':wallet,'credit_cards': credit_cards,'debit_cards': debit_cards})
 
 @login_required
 def addCreditCard(request):

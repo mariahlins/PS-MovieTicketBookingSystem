@@ -1,0 +1,30 @@
+{% extends 'cinemas/base.html' %}
+{% block content %}
+
+<form method="POST">
+    {% csrf_token %}
+    <h3 style="color: aliceblue;">Escolha o Método de Pagamento</h3>
+    <label style="color: aliceblue;"><input type="radio" name="payment_method" value="WALLET"> Wallet (Saldo: R$ {{ wallet_balance }})</label><br>
+    <label style="color: aliceblue;"><input type="radio" name="payment_method" value="CREDIT_CARD"> Cartão de Crédito</label>
+
+    <select name="card_id">
+        {% for card in credit_cards %}
+        <option style="color: aliceblue;" value="{{ card.id }}">{{ card.card_holder }} - Final {{ card.card_number }}</option>
+        {% endfor %}
+    </select><br>
+
+    <label style="color: aliceblue;"><input type="radio" name="payment_method" value="DEBIT_CARD"> Cartão de Débito</label>
+
+    <select name="card_id">
+        {% for card in debit_cards %}
+        <option style="color: aliceblue;" value="{{ card.id }}">{{ card.card_holder }} - Final {{ card.card_number }}</option>
+        {% endfor %}
+    </select><br>
+
+    <label style="color: aliceblue;"><input type="radio" name="payment_method" value="PIX"> PIX</label><br>
+
+    <button type="submit">Pagar</button>
+</form>
+
+
+{% endblock content %}

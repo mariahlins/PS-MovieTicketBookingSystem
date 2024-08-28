@@ -27,10 +27,7 @@
                     </tr>
                     <td>
                         {% if ticket.status == 'PENDING' %}
-                            <form action="{% url 'payTicket' ticket.id %}" method="post">
-                                {% csrf_token %}
-                                <button type="submit">Pagar Ticket</button>
-                            </form>
+                            <a href="{% url 'payTicket' ticket.id %}">PAGAR</a>
 
                             <form action="{% url 'cancelTicket' ticket.id %}" method="post">
                                 {% csrf_token %}

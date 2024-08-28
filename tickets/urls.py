@@ -8,4 +8,5 @@ urlpatterns=[
     path('ticketHistory/',views.ticketHistory, name='ticketHistory'),
     path('cancelledTicket/',views.cancelledTicket, name='cancelledTicket'),
     path('cancelTicket/<int:ticket_id>/', views.cancelTicket, name='cancelTicket'),
+    path('payTicket/<int:ticket_id>/', views.payTicket, name='payTicket'),
 ]

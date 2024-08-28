@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Ticket, Session, TicketCancelled
+from .models import Ticket, Session, TicketCancelled, Payment
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
@@ -7,6 +7,7 @@ from users.models import Profile, Wallet, CreditCard, DebitCard
 from .forms import TicketForm
 from django.db import IntegrityError
 from django.contrib import messages
+from django.utils.crypto import get_random_string
 
 def index(request):
     return render(request, 'cinemas/index.html')
@@ -88,5 +89,98 @@ def cancelTicket(request, ticket_id):
 
     return redirect('ticketHistory')
 
-#@login_required
-#def payTicket(request, ticket_id):
+@login_required
+def payTicket(request, ticket_id):
+    try:
+        ticket = Ticket.objects.get(id=ticket_id)
+    except Ticket.DoesNotExist:
+        return HttpResponseNotFound("Ticket não encontrado")
+    
+    if ticket.paid:
+        messages.error(request,"O pagamento já foi efetuado.")
+        return HttpResponseRedirect(reverse('ticketHistory'))
+    
+    profile = request.user.profile
+    wallet = profile.wallet
+
+    if request.method=='POST':
+        payment_method=request.POST.get('payment_method')
+
+        if payment_method=='WALLET':
+            if wallet.balance>=ticket.price:
+                wallet.deduct_balance(ticket.price)
+                payment=Payment.objects.create(
+                    ticket=ticket,
+                    amount=ticket.price,
+                    payMethod='WALLET',
+                    status='COMPLETED',
+                    transactionId=get_random_string(20)
+                )
+
+                ticket.paid=True
+                ticket.status='DONE'
+                ticket.save()
+                messages.success(request, "Pagamento concluído com sucesso.")
+                return HttpResponseRedirect(reverse('ticketHistory'))
+            else:
+                messages.error(request,"Saldo insuficiente.")
+
+        elif payment_method=='CREDIT_CARD':
+            card_id=request.POST.get('card_id')
+            try:
+                card=CreditCard.objects.get(id=card_id)
+            except CreditCard.DoesNotExist:
+                return HttpResponseNotFound("Cartão não encontrado.")
+            
+            payment=Payment.objects.create(
+                ticket=ticket,
+                amount=ticket.price,
+                payMethod='CREDIT_CARD',
+                status='COMPLETED',
+                transactionId=get_random_string(20)
+            )
+            ticket.paid=True
+            ticket.status='DONE'
+            ticket.save()
+            messages.success(request,"Pagamento concluído com sucesso usando cartão de crédito.")
+            return HttpResponseRedirect(reverse('ticketHistory'))
+
+        elif payment_method=='DEBIT_CARD':
+            card_id=request.POST.get('card_id')
+            try:
+                card=DebitCard.objects.get(id=card_id)
+            except CreditCard.DoesNotExist:
+                return HttpResponseNotFound("Cartão não encontrado.")
+            
+            payment=Payment.objects.create(
+                ticket=ticket,
+                amount=ticket.price,
+                payMethod='CREDIT_CARD',
+                status='COMPLETED',
+                transactionId=get_random_string(20)
+            )
+            ticket.paid=True
+            ticket.status='DONE'
+            ticket.save()
+            messages.success(request,"Pagamento concluído com sucesso usando cartão de debito.")
+            return HttpResponseRedirect(reverse('ticketHistory'))
+
+        elif payment_method=='PIX':     
+            payment=Payment.objects.create(
+                ticket=ticket,
+                amount=ticket.price,
+                payMethod='PIX',
+                status='COMPLETED',
+                transactionId=get_random_string(20)
+            )
+            ticket.paid=True
+            ticket.status='DONE'
+            ticket.save()
+            messages.success(request,"Pagamento concluído com sucesso usando pix.")
+            return HttpResponseRedirect(reverse('ticketHistory'))
+        
+        else:
+            messages.error(request,"Metódo de pagamento inválido ou falha no pagamento.")
+
+    context={'ticket':ticket,'wallet_balance':wallet.balance,'credit_cards':wallet.credit_cards.all(), 'debit_cards':wallet.debit_cards.all()}
+    return render(request, 'tickets/payTicket.html', context)

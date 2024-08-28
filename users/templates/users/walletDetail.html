@@ -21,6 +21,8 @@
     <li>Sem cartões de débito cadastrados.</li>
   {% endfor %}
 </ul>
+<a href="{% url 'addCreditCard' %}" style="color: aliceblue;">credito</a>
+<a href="{% url 'addDebitCard' %}" style="color: aliceblue;">debito</a>
 
 <a href="{% url 'recharge' %}">Recarregar Saldo</a>
 
