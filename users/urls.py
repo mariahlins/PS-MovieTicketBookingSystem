@@ -14,4 +14,6 @@ urlpatterns=[
     path('editStaff/<int:userId>',views.editStaff, name='editStaff'),
     path('recharge/',views.recharge, name='recharge'),
     path('walletDetail/',views.walletDetail, name='walletDetail'),
+    path('addCreditCard/',views.addCreditCard, name='addCreditCard'),
+    path('addDebitCard/',views.addDebitCard, name='addDebitCard'),
 ]

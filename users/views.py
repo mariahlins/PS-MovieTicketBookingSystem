@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from .forms import SignUpForm, SignUpFormStaff
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Profile, Wallet
+from .models import Profile, Wallet, CreditCard, DebitCard
 from tickets.models import Payment
 from django.db import IntegrityError
 from decimal import Decimal
@@ -146,7 +146,7 @@ def editStaff(request, userId):
 
 
 #wallet
-
+@login_required
 def recharge(request):
     if request.method=='POST':
         amount=Decimal(request.POST.get('amount'))
@@ -174,6 +174,7 @@ def recharge(request):
     
     return render(request, 'users/recharge.html')
 
+@login_required
 def walletDetail(request):
     try:
         wallet=Wallet.objects.get(profile=request.user.profile)
@@ -181,3 +182,43 @@ def walletDetail(request):
         return HttpResponseNotFound("Carteira não encontrada. Tente novamente.")
     
     return render(request, 'users/walletDetail.html', {'wallet':wallet})
+
+@login_required
+def addCreditCard(request):
+    if request.method=='POST':
+        card_holder=request.POST.get('card_holder')
+        card_number=request.POST.get('card_number')
+        expiration_date=request.POST.get('expiration_date')
+        cvv=request.POST.get('cvv')
+
+        wallet, created=Wallet.objects.get_or_create(profile=request.user.profile)
+        CreditCard.objects.create(
+            wallet=wallet,
+            card_holder=card_holder,
+            card_number=card_number,
+            expiration_date=expiration_date,
+            cvv=cvv
+        )
+        return redirect('walletDetail')
+    
+    return render(request, 'users/addCreditCard.html')
+
+@login_required
+def addDebitCard(request):
+    if request.method=='POST':
+        card_holder=request.POST.get('card_holder')
+        card_number=request.POST.get('card_number')
+        expiration_date=request.POST.get('expiration_date')
+        cvv=request.POST.get('cvv')
+
+        wallet, created=Wallet.objects.get_or_create(profile=request.user.profile)
+        DebitCard.objects.create(
+            wallet=wallet,
+            card_holder=card_holder,
+            card_number=card_number,
+            expiration_date=expiration_date,
+            cvv=cvv
+        )
+        return redirect('walletDetail')
+    
+    return render(request, 'users/addDebitCard.html')

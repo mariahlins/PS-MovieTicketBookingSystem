@@ -3,11 +3,10 @@ from .models import Ticket, Session, TicketCancelled
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from users.models import Profile
+from users.models import Profile, Wallet, CreditCard, DebitCard
 from .forms import TicketForm
 from django.db import IntegrityError
 from django.contrib import messages
-import json
 
 def index(request):
     return render(request, 'cinemas/index.html')
@@ -45,6 +44,7 @@ def sessionTicket(request, ticketId):
     context = {'ticket': ticket, 'form': form}
     return render(request, 'tickets/sessionTicket.html', context)
 
+@login_required
 def ticketHistory(request):
     try:
         tickets = Ticket.objects.filter(user=request.user.profile).order_by('-purchasedAt')
@@ -53,7 +53,7 @@ def ticketHistory(request):
         return HttpResponseNotFound("Ticket não encontrado")
     return render(request, 'tickets/ticketHistory.html', {'tickets': tickets, 'ticketsc':ticketsc})
 
-
+@login_required
 def activeTickets(request):
     try:
         active_tickets = Ticket.objects.filter(user=request.user.profile, status__in=['PENDING', 'DONE'])
@@ -61,7 +61,7 @@ def activeTickets(request):
         return HttpResponseNotFound("Ticket não encontrado")
     return render(request, 'tickets/activeTickets.html', {'active_tickets': active_tickets})
 
-
+@login_required
 def cancelledTicket(request):
     try:
         ticket_cancelled = TicketCancelled.objects.filter(user=request.user.profile)
@@ -70,6 +70,7 @@ def cancelledTicket(request):
     
     return render(request, 'tickets/cancelledTicket.html', {'ticket_cancelled': ticket_cancelled})
 
+@login_required
 def cancelTicket(request, ticket_id):
     try:
         ticket = Ticket.objects.get(id=ticket_id)
@@ -86,3 +87,6 @@ def cancelTicket(request, ticket_id):
         messages.error(request, 'Você não tem permissão para cancelar este ticket.')
 
     return redirect('ticketHistory')
+
+#@login_required
+#def payTicket(request, ticket_id):

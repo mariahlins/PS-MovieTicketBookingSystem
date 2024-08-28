@@ -1,0 +1,24 @@
+{% extends 'cinemas/base.html' %}
+
+{% block content %}
+
+<h1>Adicionar Cartão de Débito</h1>
+<form method="post">
+  {% csrf_token %}
+  <label for="card_holder">Nome no Cartão:</label>
+  <input type="text" name="card_holder" required>
+  
+  <label for="card_number">Número do Cartão:</label>
+  <input type="text" name="card_number" maxlength="16" required>
+  
+  <label for="expiration_date">Data de Expiração:</label>
+  <input type="date" name="expiration_date" required>
+  
+  <label for="cvv">CVV:</label>
+  <input type="text" name="cvv" maxlength="3" required>
+  
+  <button type="submit">Adicionar Cartão</button>
+</form>
+
+
+{% endblock %}

@@ -6,12 +6,20 @@
 
 <h2>Cartões de Crédito</h2>
 <ul>
+  {% for card in credit_cards %}
+    <li>{{ card.card_holder }} - Final {{ card.card_number }}</li>
+  {% empty %}
     <li>Sem cartões de crédito cadastrados.</li>
+  {% endfor %}
 </ul>
 
 <h2>Cartões de Débito</h2>
 <ul>
+  {% for card in debit_cards %}
+    <li>{{ card.card_holder }} - Final {{ card.card_number }}</li>
+  {% empty %}
     <li>Sem cartões de débito cadastrados.</li>
+  {% endfor %}
 </ul>
 
 <a href="{% url 'recharge' %}">Recarregar Saldo</a>
