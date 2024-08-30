@@ -1,0 +1,11 @@
+{% extends 'cinemas/base.html' %}
+
+{% block content %}
+
+<form action="{% url 'newCoupon' %}" method='post' style="color: aliceblue;">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button name="submit">Adicionar</button>
+</form>
+
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'cinemas/base.html' %}
+
+{% block content %}
+
+<h2 style="text-align: center; color:ghostwhite; font-family: 'Lexend', sans-serif;">Coupons</h2>
+<a href="{% url 'newCoupon' %}" style="color: aliceblue;">novo cupom</a>
+
+<div class="container">
+    <div class="card-container">
+        {% for coupon in coupons %}
+        <div class="card">
+            {{ coupon }}
+            {% if coupon.active %}
+            <h3 style="color: aliceblue;">ATIVO</h3>
+            {% endif %}
+            {% if user.is_superuser %}
+            <a href="{% url 'editCoupon' coupon.id %}" class="btn">Editar cupom</a>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="card">
+            <p>Não há cupons registrados</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

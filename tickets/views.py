@@ -1,10 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Ticket, Session, TicketCancelled, Payment
+from .models import Ticket, Session, TicketCancelled, Payment, Coupon
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from users.models import Profile, Wallet, CreditCard, DebitCard
-from .forms import TicketForm
+from users.models import Profile, CreditCard, DebitCard
+from .forms import TicketForm, CouponForm
 from django.db import IntegrityError
 from django.contrib import messages
 from django.utils.crypto import get_random_string
@@ -14,9 +14,13 @@ def index(request):
 
 @login_required
 def tickets(request, sessionId):
-    session = get_object_or_404(Session, id=sessionId)
-    tickets = Ticket.objects.filter(session=session)
-    context = {'session': session, 'tickets': tickets}
+    try:
+        session=Session.objects.get(id=sessionId)
+    except Session.DoesNotExist:
+        return HttpResponseNotFound("Sessão não encontrada")
+    
+    tickets=Ticket.objects.filter(session=session)
+    context={'session': session, 'tickets': tickets}
     return render(request, 'tickets/tickets.html', context)
 
 @login_required
@@ -31,9 +35,22 @@ def sessionTicket(request, ticketId):
     if request.method == 'POST':
         form = TicketForm(request.POST, instance=ticket)
         if form.is_valid():
+            coupon_code=form.cleaned_data['coupon_code']
             ticketType = form.cleaned_data['ticketType']
             if not ticket.is_reserved:
                 try:
+                    if coupon_code:
+                        try:
+                            coupon=Coupon.objects.get(code=coupon_code, active=True)
+                            if coupon.is_valid():
+                                discount_amount=ticket.price*(coupon.discount/100)
+                                ticket.price-=discount_amount
+                                ticket.coupon=coupon
+                            else:
+                                form.add_error('coupon_code',"Cupom invalido ou expirado")
+                        except Coupon.DoesNotExist:
+                            form.add_error('coupon_code',"Cupom não encontrado")
+
                     ticket.reserve(profile, ticketType)
                     return HttpResponseRedirect(reverse('tickets', args=[ticket.session.id]))
                 except IntegrityError:
@@ -42,6 +59,7 @@ def sessionTicket(request, ticketId):
                     form.add_error(None, f"Erro inesperado: {e}")
     else:
         form = TicketForm(instance=ticket)
+
     context = {'ticket': ticket, 'form': form}
     return render(request, 'tickets/sessionTicket.html', context)
 
@@ -184,3 +202,46 @@ def payTicket(request, ticket_id):
 
     context={'ticket':ticket,'wallet_balance':wallet.balance,'credit_cards':wallet.credit_cards.all(), 'debit_cards':wallet.debit_cards.all()}
     return render(request, 'tickets/payTicket.html', context)
+
+@login_required
+def coupons(request):
+    coupons=Coupon.objects.order_by('validUntil')
+    return render(request,'tickets/coupons.html', {'coupons':coupons})
+
+@login_required
+def newCoupon(request):
+    if request.method!='POST':
+        form=CouponForm()
+    else:
+        form=CouponForm(request.POST)
+        if form.is_valid():
+            try:
+                form.save()
+                return HttpResponseRedirect(reverse('coupons'))
+            except IntegrityError:
+                form.add_error(None, "Erro ao salvar. Dados duplicados ou violaçãpo de integridade.")
+            except Exception as e:
+                form.add_error(None, f"Erro inesperado: {e}")
+
+    return render(request, 'tickets/newCoupon.html', {'form':form})
+
+def editCoupon(request, coupon_id):
+    try:
+        coupon=Coupon.objects.get(id=coupon_id)
+    except Coupon.DoesNotExist:
+        return HttpResponseNotFound("Cupom não encontrado.")
+    
+    if request.method=='POST':
+        form=CouponForm(instance=coupon, data=request.POST)
+        if form.is_valid():
+            try:
+                form.save()
+                return HttpResponseRedirect(reverse('coupons'))
+            except IntegrityError:
+                form.add_error(None, "Erro ao salvar. Dados duplicados ou violação de integridade")
+            except Exception as e:
+                    form.add_error(None, f"Erro inesperado: {e}")
+    else:
+        form=CouponForm(instance=coupon)
+    
+    return render(request, 'tickets/editCoupon.html', {'coupon':coupon, 'form':form})
