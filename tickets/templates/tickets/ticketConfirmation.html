@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmação de Pagamento e Ticket</title>
+</head>
+<body>
+    <h1>Confirmação de Pagamento</h1>
+    <p>Olá, {{ user.first_name }}!</p>
+    <p>Seu pagamento foi confirmado. Aqui estão os detalhes do seu ticket:</p>
+    <ul>
+        <li><strong>Filme:</strong> {{ ticket.session.movie.title }}</li><br>
+        <li><strong>Sessão:</strong> {{ ticket.session.date }} - {{ ticket.session.hour }}</li><br>
+        <li><strong>Assento:</strong> {{ ticket.seatNumber }}</li><br>
+        <li><strong>Preço:</strong> R$ {{ ticket.price }}</li><br>
+        <li><strong>Método de Pagamento:</strong> {{ payment.get_payMethod_display }}</li><br>
+    </ul>
+    <p>O QR code para o seu ingresso está anexado a este e-mail. Utilize-o para entrar na sessão.</p><br><br>
+    <p>Obrigado por escolher nossa plataforma!</p>
+</body>
+</html>

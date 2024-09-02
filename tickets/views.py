@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+import qrcode.constants
 from .models import Ticket, Session, TicketCancelled, Payment, Coupon
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.urls import reverse
@@ -8,6 +9,12 @@ from .forms import TicketForm, CouponForm
 from django.db import IntegrityError
 from django.contrib import messages
 from django.utils.crypto import get_random_string
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from io import BytesIO
+from django.core.files.base import ContentFile
+import qrcode
 
 def index(request):
     return render(request, 'cinemas/index.html')
@@ -138,7 +145,7 @@ def payTicket(request, ticket_id):
                 ticket.paid=True
                 ticket.status='DONE'
                 ticket.save()
-                #sendTicketEmail(request.user,ticket,payment)
+                sendTicketEmail(request.user,ticket,payment)
                 messages.success(request, "Pagamento concluído com sucesso.")
                 return HttpResponseRedirect(reverse('ticketHistory'))
             else:
@@ -161,7 +168,7 @@ def payTicket(request, ticket_id):
             ticket.paid=True
             ticket.status='DONE'
             ticket.save()
-            #sendTicketEmail(request.user,ticket,payment)
+            sendTicketEmail(request.user,ticket,payment)
             messages.success(request,"Pagamento concluído com sucesso usando cartão de crédito.")
             return HttpResponseRedirect(reverse('ticketHistory'))
 
@@ -182,7 +189,7 @@ def payTicket(request, ticket_id):
             ticket.paid=True
             ticket.status='DONE'
             ticket.save()
-            #sendTicketEmail(request.user,ticket,payment)
+            sendTicketEmail(request.user,ticket,payment)
             messages.success(request,"Pagamento concluído com sucesso usando cartão de debito.")
             return HttpResponseRedirect(reverse('ticketHistory'))
 
@@ -197,7 +204,7 @@ def payTicket(request, ticket_id):
             ticket.paid=True
             ticket.status='DONE'
             ticket.save()
-            #sendTicketEmail(request.user,ticket,payment)
+            sendTicketEmail(request.user,ticket,payment)
             messages.success(request,"Pagamento concluído com sucesso usando pix.")
             return HttpResponseRedirect(reverse('ticketHistory'))
         
@@ -250,4 +257,32 @@ def editCoupon(request, coupon_id):
     
     return render(request, 'tickets/editCoupon.html', {'coupon':coupon, 'form':form})
 
-#def sendTicketEmail(request, ticket, payment)
+def sendTicketEmail(user, ticket, payment):
+    qrData=f"Ticket ID:{ticket.id}, Sessão: {ticket.session.movie.title}, Hora: {ticket.session.hour},Assento: {ticket.seatNumber}"
+    qr=qrcode.QRCode(
+        version=1, error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10, border=4
+    )
+
+    qr.add_data(qrData)
+    qr.make(fit=True)
+
+    img=qr.make_image(fill='black', back_color='white')
+    buffer=BytesIO()
+    img.save(buffer, format="PNG")
+    buffer.seek(0)
+    qrCodeImage=ContentFile(buffer.read(), name=f'ticket_{ticket.id}_qrcode.png')
+
+    context={'user':user,'ticket':ticket,'payment':payment}
+    htmlContent=render_to_string('tickets/ticketConfirmation.html', context)
+    textContent=strip_tags(htmlContent)
+
+    email=EmailMessage(
+        subject=f"Confirmação de Pagamento e Ticket - {ticket.session.movie.title}",
+        body=textContent,
+        from_email='cinepass.p3@gmail.com',
+        to=[user.email],
+    )
+    email.attach(qrCodeImage.name, qrCodeImage.read(), 'image/png')
+    email.content_subtype='html'
+    email.send()
