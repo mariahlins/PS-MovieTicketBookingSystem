@@ -50,6 +50,11 @@
                                 Não disponível
                             {% endif %}
                         </td>
+                        <td>
+                            {% if ticket.status != 'CANCELLED' %}
+                                <a href="{% url 'newReview' ticket.id %}">adicionar review</a>
+                            {% endif %}
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>

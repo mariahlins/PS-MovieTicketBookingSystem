@@ -1,0 +1,12 @@
+{% extends 'cinemas/base.html' %}
+
+{% block content %}
+
+<form action="{% url 'deleteReview' review.id %}" method='post'>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button name="submit">Salvar</button>
+    <a href="{% url 'perfilClient' %}">Cancelar</a>
+</form>
+
+{% endblock %}

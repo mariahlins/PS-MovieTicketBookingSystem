@@ -3,7 +3,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from decimal import Decimal
-
+from movies.models import Movie
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -61,3 +61,36 @@ class DebitCard(models.Model):
 
     def __str__(self):
         return f"Cartão de Débito - {self.card_holder} - Final {self.card_number[-4:]}"
+    
+
+class Review(models.Model):
+    RATE_CHOICES=[
+        (1,1),
+        (2,2),
+        (3,3),
+        (4,4),
+        (5,5),
+        (6,6),
+        (7,7),
+        (8,8),
+        (9,9),
+        (10,10),
+    ]
+
+    profile=models.ForeignKey(Profile, on_delete=models.CASCADE)
+    movie=models.ForeignKey(Movie, on_delete=models.CASCADE)
+    rate=models.PositiveBigIntegerField(choices=RATE_CHOICES)
+    comment=models.CharField(max_length=500)
+    created_at=models.DateTimeField(auto_now_add=True)
+    updated_at=models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together=('movie','profile')
+
+    def clean(self):
+        if Review.objects.filter(movie=self.movie, profile=self.profile).exclude(id=self.id).exists():
+            raise ValidationError("Voce já avaliou esse filme")
+        super().clean()
+
+    def __str__(self):
+        return f"{self.profile} - {self.movie}"

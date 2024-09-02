@@ -1,0 +1,11 @@
+{% extends 'cinemas/base.html' %}
+
+{% block content %}
+
+<form action="{% url 'editReview' review.id %}" method='post'>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button name="submit">Salvar</button>
+</form>
+
+{% endblock %}

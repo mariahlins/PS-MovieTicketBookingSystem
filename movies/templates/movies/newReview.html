@@ -1,0 +1,12 @@
+{% extends 'cinemas/base.html' %}
+
+{% block content %}
+
+<p>Você está comentando o filme</p>
+    <form action="{% url 'newReview' ticket.id %}" method='post' style="color: aliceblue;">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button name="submit">Adicionar</button>
+    </form>
+
+{% endblock %}

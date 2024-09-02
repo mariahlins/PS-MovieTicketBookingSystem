@@ -11,6 +11,13 @@
         <a href="{% url 'deleteMovie' movie.id %}">delete movie</a>
         {% endif %}
         <img src="{{movie.poster}}">
+        {% for review in reviews %}
+            <h2 style="color: aliceblue;">{{review.profile.user.username}}</h2>
+            <h4 style="color: aliceblue;">{{review.rate}}</h4>
+            <h4 style="color: aliceblue;">{{review.comment}}</h4>
+            <a href="{% url 'editReview' review.id %}">editar review</a>
+            <a href="{% url 'deleteReview' review.id %}">deletar review</a>
+        {% endfor %}
     </div>
 </div>
 
