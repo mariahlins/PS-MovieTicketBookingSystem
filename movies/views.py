@@ -1,12 +1,15 @@
 from django.shortcuts import render
 from .models import Movie
 from tickets.models import Ticket
-from users.models import Review
+from users.models import Review, Profile
 from .forms import MovieForm, ReviewForm
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
 def movies(request):
     movies=Movie.objects.order_by('title')
@@ -146,3 +149,21 @@ def deleteReview(request, reviewId):
 
     context = {'review': review}
     return render(request, 'movies/deleteReview.html', context)
+
+def notifyNewMovie(movie):
+    users=Profile.objects.filter(receive_movie_notifications=True)
+
+    for user in users:
+        context={'user':user, 'movie': movie}
+        htmlContent=render_to_string('movies/newMovieNotify.html', context)
+        textContent=strip_tags(htmlContent)
+
+        email=EmailMessage(
+            subject=f"Novo filme disponível: {movie.title}",
+            body=textContent,
+            from_email='cinepass.p3@gmail.com',
+            to=[user.user.email]
+        )
+        email.content_subtype='html'
+        email.send()
+        

@@ -6,8 +6,9 @@ from decimal import Decimal
 from movies.models import Movie
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    birth_date = models.DateField(null=True, blank=True)
+    user=models.OneToOneField(User, on_delete=models.CASCADE)
+    birth_date=models.DateField(null=True, blank=True)
+    receive_movie_notifications=models.BooleanField(default=True)
 
     def clean(self):
         super().clean()
