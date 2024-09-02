@@ -138,6 +138,7 @@ def payTicket(request, ticket_id):
                 ticket.paid=True
                 ticket.status='DONE'
                 ticket.save()
+                #sendTicketEmail(request.user,ticket,payment)
                 messages.success(request, "Pagamento concluído com sucesso.")
                 return HttpResponseRedirect(reverse('ticketHistory'))
             else:
@@ -160,6 +161,7 @@ def payTicket(request, ticket_id):
             ticket.paid=True
             ticket.status='DONE'
             ticket.save()
+            #sendTicketEmail(request.user,ticket,payment)
             messages.success(request,"Pagamento concluído com sucesso usando cartão de crédito.")
             return HttpResponseRedirect(reverse('ticketHistory'))
 
@@ -180,6 +182,7 @@ def payTicket(request, ticket_id):
             ticket.paid=True
             ticket.status='DONE'
             ticket.save()
+            #sendTicketEmail(request.user,ticket,payment)
             messages.success(request,"Pagamento concluído com sucesso usando cartão de debito.")
             return HttpResponseRedirect(reverse('ticketHistory'))
 
@@ -194,6 +197,7 @@ def payTicket(request, ticket_id):
             ticket.paid=True
             ticket.status='DONE'
             ticket.save()
+            #sendTicketEmail(request.user,ticket,payment)
             messages.success(request,"Pagamento concluído com sucesso usando pix.")
             return HttpResponseRedirect(reverse('ticketHistory'))
         
@@ -245,3 +249,5 @@ def editCoupon(request, coupon_id):
         form=CouponForm(instance=coupon)
     
     return render(request, 'tickets/editCoupon.html', {'coupon':coupon, 'form':form})
+
+#def sendTicketEmail(request, ticket, payment)
