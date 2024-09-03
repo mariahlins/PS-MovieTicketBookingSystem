@@ -11,8 +11,10 @@
             <h2>{{ session.movie.title }}</h2>
             <h5>{{ session.cinema }}</h5>
             <h3><a href="{% url 'tickets' session.id %}">tickets da sessao</a></h3>
-            <h3><a href="{% url 'deleteSession' session.id %}">deletar sessao</a></h3>
-            <h3><a href="{% url 'edit_session_step1' session.id %}">editar sessao</a></h3>
+            {% if user.is_superuser %}
+                <h3><a href="{% url 'deleteSession' session.id %}">deletar sessao</a></h3>
+                <h3><a href="{% url 'edit_session_step1' session.id %}">editar sessao</a></h3>
+            {% endif %}
         </div>
         {% empty %}
         <div class="card">

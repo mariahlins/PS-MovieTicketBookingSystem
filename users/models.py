@@ -13,7 +13,7 @@ class Profile(models.Model):
     def clean(self):
         super().clean()
         if self.birth_date and self.birth_date > timezone.now().date():
-            raise ValidationError("A data de nascimento não pode ser no futuro.")
+            raise ValidationError("Data de nascimento inválida")
     
     def __str__(self):
         return f"{self.user.first_name} {self.user.username}: {self.user.email}"

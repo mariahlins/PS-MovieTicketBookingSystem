@@ -8,9 +8,9 @@
     <div class="main_card">
         <div class="card_left">
             <div class="card_details">
-                <h1><a href="{% url 'movie' movie.id %}">{{movie.title}}</a></h1>
+                <h1><a href="{% url 'movie' movie.id %}" style="font-size: 26px;">{{movie.title}} ({{movie.year}})</a></h1>
                 <p class="disc">{{movie.plot}}</p>
-                <a href="{% url 'movie' movie.id %}"  target="_blank">Read More</a>
+                <a href="{% url 'movie' movie.id %}">Read More</a>
                 <div class="card_cat">
                     <p class="year">{{movie.year}}</p>
                     <p class="genre">{{movie.genre1}}</p>

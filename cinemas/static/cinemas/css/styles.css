@@ -452,3 +452,65 @@ button:hover {
 .buttonperfil:hover {
   box-shadow: inset 0px 0px 15px #4b012b;
 }
+
+.movie{
+  background-color:rgba(250, 232, 239, 0.15);
+  border-radius: 10px;
+  display: flex;
+  margin-left: 50px;
+  margin-right: 50px;
+  margin-top: 20px;
+  height: 480px;
+}
+
+.movie-info{
+  display: flow;
+  margin: 15px;
+  align-items: center;
+}
+
+.movie-info h3{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Lexend", sans-serif;
+  font-size: 26px;
+}
+
+.movie-info h5{
+  color: #f2f2f6;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  font-family: "Manrope", sans-serif;
+  font-size: 18px;
+  margin-left: 70px;
+  margin-right: 100px;
+}
+
+.movie button{
+  font-size: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 180px;
+  height: 50px;
+  color: #ddd;
+  background-color: #760157;
+  padding: auto;
+}
+
+.movie button:hover{
+  color: #fff;
+  background-color: #970370;
+  transform: scale(1);
+}
+
+.movie img{
+  border-radius: 10px;
+  height: 400px;
+  margin: 25px;
+  margin-left: 70px;
+}
