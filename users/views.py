@@ -29,6 +29,15 @@ def perfilAdmin(request):
     context={'users':users}
     return render(request, 'users/perfilAdmin.html', context)
 
+@login_required
+def user(request):
+    if not request.user.is_superuser:
+        return HttpResponseRedirect(reverse('index'))
+    
+    users=Profile.objects.order_by('user')
+    context={'users':users}
+    return render(request, 'users/user.html', context)
+
 def register(request):
     if request.method=='POST':
         form=SignUpForm(data=request.POST)

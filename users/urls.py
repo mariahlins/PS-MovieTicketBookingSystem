@@ -16,4 +16,5 @@ urlpatterns=[
     path('walletDetail/',views.walletDetail, name='walletDetail'),
     path('addCreditCard/',views.addCreditCard, name='addCreditCard'),
     path('addDebitCard/',views.addDebitCard, name='addDebitCard'),
+    path('user/',views.user, name='user'),
 ]

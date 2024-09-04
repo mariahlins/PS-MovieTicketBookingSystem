@@ -2,18 +2,19 @@
 
 {% block content %}
 
-<h2 style="text-align: center; color:ghostwhite; font-family: 'Lexend', sans-serif;">Todos as sessoes</h2>
+<h2 style="text-align: center; color:ghostwhite; font-family: 'Lexend', sans-serif;">Todas as sessoes</h2>
 
 <div class="container">
-    <div class="card-container">
+    <div class="card-container" style="padding-top: 15px;">
         {% for session in sessions %}
-        <div class="card">
-            <h2>{{ session.movie.title }}</h2>
+        <div class="card" style="width: 350px;">
+            <h2 style="padding-bottom: 15px;">{{ session.movie.title }}</h2>
             <h5>{{ session.cinema }}</h5>
-            <h3><a href="{% url 'tickets' session.id %}">tickets da sessao</a></h3>
+            <h5>{{ session.date }}  |  {{ session.hour }}</h5>
+            <h3 style="padding-top: 10px;"><a href="{% url 'tickets' session.id %}" style="padding-bottom: 15px;">Comprar ticket</a></h3>
             {% if user.is_superuser %}
-                <h3><a href="{% url 'deleteSession' session.id %}">deletar sessao</a></h3>
-                <h3><a href="{% url 'edit_session_step1' session.id %}">editar sessao</a></h3>
+            <h3 style="padding-top:15px;"><a href="{% url 'edit_session_step1' session.id %}" style="color: rgb(94, 2, 41);">Editar sessao</a></h3>
+            <h3 style="padding-top: 5px;"><a href="{% url 'deleteSession' session.id %}" style="color: rgb(88, 3, 39);">Deletar sessao</a></h3>
             {% endif %}
         </div>
         {% empty %}

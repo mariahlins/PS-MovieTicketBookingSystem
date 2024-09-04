@@ -4,11 +4,13 @@ from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.urls import reverse
 from .models import Session
 from .forms import FirstStepForm, SecondStepForm
-
+from django.utils import timezone
 
 @login_required
 def sessions(request):
-    sessions=Session.objects.order_by('date')
+    today=timezone.now().date()
+    #sessions=Session.objects.filter(date__gte=today).order_by('-date')
+    sessions=Session.objects.order_by('-date')
     context={'sessions':sessions}
     return render(request, 'sessoes/sessions.html', context)
 

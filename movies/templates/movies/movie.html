@@ -21,12 +21,25 @@
     </div>
     <div class="review-container">
         <div>
+            <h2 style="color: aliceblue; padding-bottom: 46px;">Reviews do filme {{movie.title}}</h2>
             {% for review in reviews %}
-            <h2 style="color: aliceblue;">{{review.profile.user.username}}</h2>
-            <h4 style="color: aliceblue;">{{review.rate}}</h4>
-            <h4 style="color: aliceblue;">{{review.comment}}</h4>
-            <a href="{% url 'editReview' review.id %}">editar review</a>
-            <a href="{% url 'deleteReview' review.id %}">deletar review</a>
+            <h2 style="color: aliceblue; display: flex; align-items: center;">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width: 20px; height: 20px; margin-right: 8px;" viewBox="0 0 16 16" fill="currentColor" class="bi bi-person-circle">
+                    <path d="M13.468 12.37C12.758 11.226 11.421 10.5 8 10.5s-4.758.726-5.468 1.87A6.982 6.982 0 0 0 8 15a6.982 6.982 0 0 0 5.468-2.63zM8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                    <path fill-rule="evenodd" d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 13a6 6 0 1 1 0-12 6 6 0 0 1 0 12z"/>
+                </svg>
+                {{review.profile.user.username}}
+            </h2>
+            <h4 style="color: aliceblue; padding-bottom: 15px;">Nota: {{review.rate}}</h4>
+            <h4 style="color: aliceblue; padding-bottom: 10px;">{{review.comment}}</h4>
+                {% if review.profile == request.user.profile %}
+                        <a href="{% url 'editReview' review.id %}" style="text-decoration: none; color: rgb(167, 57, 104); font-weight: bold;">Editar review |</a>
+                        <a href="{% url 'deleteReview' review.id %}" style="text-decoration: none; color: rgb(118, 1, 53); font-weight: bold;">Deletar review</a>
+                {% elif user.is_superuser %}
+                    <a href="{% url 'deleteReview' review.id %}" style="text-decoration: none; color: rgb(118, 1, 53); font-weight: bold;">Deletar review</a>
+                {% endif %}
+                {% empty %}
+                Não há reviews disponíveis.
             {% endfor %}
         </div>
     </div>

@@ -1,18 +1,22 @@
 {% extends 'cinemas/base.html' %}
 {% block content %}
 
-<a href="{% url 'coupons' %}" style="color: aliceblue;">cupons</a>
-
-<div class="container">
-    <a href="{% url 'registerStaff' %}" style="color: azure;">Register Staff</a>
-    <ul style="display: grid;">
-        {% for user in users %}
-        <li>
-            {{user}}
-            <a href="{% url 'editStaff' user.id %}">editar usuário</a>
-        </li>
-        {% endfor %}
-    </ul>
+<div class="perfil">
+    <div class="submenu">
+        <h1>Cupons</h1>
+        <button class="buttonperfil">
+            <a href="{% url 'coupons' %}">Todos os cupons</a><br>
+        </button>
+    </div>
+    <div class="submenu">
+        <h1>Usuários</h1>
+        <button class="buttonperfil">
+            <a href="{% url 'user' %}">Todos os Usuários</a><br>
+        </button>
+        <button class="buttonperfil">
+            <a href="{% url 'registerStaff' %}">Registrar Staff</a><br>
+        </button>
+    </div>
 </div>
 
 {% endblock content %}
