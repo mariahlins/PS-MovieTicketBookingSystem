@@ -44,13 +44,14 @@ def register(request):
         if form.is_valid():
             try:
                 newUser=form.save()
+                Wallet.objects.create(profile=newUser.profile)
                 authenticatedUser=authenticate(username=newUser.username, password=request.POST['password'])
                 login(request, authenticatedUser)
                 return HttpResponseRedirect(reverse('index'))
             except IntegrityError:
                 form.add_error(None, "Erro ao criar o usuário. Dados duplicados ou violação de integridade.")
             except Exception as e:
-                form.add_error(form.add_error(None, f"Erro inesperado: {e}"))
+                form.add_error(None, f"Erro inesperado: {e}")
     else:
         form=SignUpForm()
 

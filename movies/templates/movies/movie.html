@@ -39,7 +39,7 @@
                     <a href="{% url 'deleteReview' review.id %}" style="text-decoration: none; color: rgb(118, 1, 53); font-weight: bold;">Deletar review</a>
                 {% endif %}
                 {% empty %}
-                Não há reviews disponíveis.
+                <h3 style="color: aliceblue;">Não há reviews disponíveis para este filme.</h3>
             {% endfor %}
         </div>
     </div>
