@@ -2,44 +2,51 @@
 {% block content %}
 
 <h1>Meus Tickets Ativos</h1>
-    
     {% if active_tickets %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Número do Assento</th>
-                    <th>Tipo de Ticket</th>
-                    <th>Status</th>
-                    <th>Preço</th>
-                    <th>Data da Compra</th>
-                    <th>Data da Sessão</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for ticket in active_tickets %}
-                    <tr>
-                        <td>{{ ticket.seatNumber }}</td>
-                        <td>{{ ticket.ticketType }}</td>
-                        <td>{{ ticket.get_status_display }}</td>
-                        <td>{{ ticket.price }}</td>
-                        <td>{{ ticket.purchasedAt }}</td>
-                        <td>{{ ticket.session.date }}</td>
-                    </tr>
-                    <td>
-                        {% if ticket.status == 'PENDING' %}
-                            <a href="{% url 'payTicket' ticket.id %}">PAGAR</a>
+    {% for ticket in active_tickets %}
+    <div class="ticket">
+        <div class="item">
+            <div class="item-right">
+              <h2 class="num">{{ticket.session.date}}</h2>
+              <p class="day">Assento {{ticket.seatNumber}}</p>
+              <span class="up-border"></span>
+              <span class="down-border"></span>
+            </div> 
+            
+            <div class="item-left">
+                {% if ticket.paid %}
+                    <p class="event" style="color: rgb(200, 10, 120);">Ticket pago!</p>
+                {% elif ticket.status == 'PENDING' %}
+                <div style="display: flex; justify-content: space-evenly; margin-bottom: 15px;">
+                    <button><a href="{% url 'payTicket' ticket.id %}" style="text-decoration: none; color: aliceblue; font-weight: bold;">PAGAR</a></button>
 
-                            <form action="{% url 'cancelTicket' ticket.id %}" method="post">
-                                {% csrf_token %}
-                                <button type="submit">Cancelar Ticket</button>
-                            </form>
-                        {% else %}
-                            Botão de refunding
-                        {% endif %}
-                    </td>
-                {% endfor %}
-            </tbody>
-        </table>
+                    <form action="{% url 'cancelTicket' ticket.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" style="background-color: darkgray;">Cancelar Ticket</button>
+                    </form>
+                </div>
+                {% endif %}
+              <h2 class="title">{{ticket.session.movie.title}}</h2>
+              
+              <div class="sce">
+                <div class="icon">
+                  <i class="fa fa-table"></i>
+                </div>
+                <p>R${{ ticket.price }} (TIPO: {{ ticket.ticketType }})<br/> {{ticket.session.hour}}</p>
+              </div>
+              <div class="fix"></div>
+              <div class="loc">
+                <div class="icon">
+                  <i class="fa fa-map-marker"></i>
+                </div>
+                <p>Status: {{ ticket.get_status_display }} <br/> {{ticket.session.cinema}}</p>
+              </div>
+              <div class="fix"></div>
+              <button class="ticket-session"><a href="{% url 'tickets' ticket.session.id %}" style="text-decoration: none; color: whitesmoke;">Visualizar sessão</a></button>
+            </div> 
+          </div>
+        </div>
+    {% endfor %}
     {% else %}
         <p>Você não possui tickets ativos no momento.</p>
     {% endif %}

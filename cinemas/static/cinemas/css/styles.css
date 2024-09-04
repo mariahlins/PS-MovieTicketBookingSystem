@@ -514,3 +514,127 @@ button:hover {
   margin: 25px;
   margin-left: 70px;
 }
+
+* {
+  box-sizing: border-box;
+  margin:0;
+  padding:0;
+}
+
+div.ticket {
+  max-width: 1750px;
+  margin: 0 auto;
+  overflow: hidden;
+  margin-left: 50px;
+  max-height: 1000px;
+}
+
+.upcomming {
+  font-size: 45px;
+  text-transform: uppercase;
+  border-left: 14px solid rgba(255, 235, 59, 0.78);
+  padding-left: 12px;
+  margin: 18px 8px;
+}
+.ticket .item {
+  width: 48%;
+  float: left;
+  padding: 0 20px;
+  background: #fff;
+  overflow: hidden;
+  margin: 10px
+}
+.ticket .item-right, .ticket .item-left {
+  float: left;
+  padding: 20px 
+}
+.ticket .item-right {
+  padding: 79px 50px;
+  margin-right: 20px;
+  width: 25%;
+  position: relative;
+  height: 286px
+}
+.ticket .item-right .up-border, .ticket .item-right .down-border {
+    padding: 14px 15px;
+    background-color: #ddd;
+    border-radius: 50%;
+    position: absolute
+}
+.ticket .item-right .up-border {
+  top: -8px;
+  right: -35px;
+}
+.ticket .item-right .down-border {
+  bottom: -13px;
+  right: -35px;
+}
+.ticket .item-right .num {
+  font-size: 30px;
+  text-align: center;
+  color: #970370;
+}
+.ticket .item-right .day, .ticket .item-left .event {
+  color: #555;
+  font-size: 20px;
+  margin-bottom: 9px;
+}
+.ticket .item-right .day {
+  color: #b31360;
+  text-align: center;
+  display: flex;
+  font-size: 16px;
+}
+.ticket .item-left {
+  width: 71%;
+  padding: 34px 0px 19px 46px;
+  border-left: 3px dotted #999;
+} 
+.ticket .item-left .title {
+  color: #111;
+  font-size: 34px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+.ticket .item-left .sce {
+  margin-top: 5px;
+  display: block
+}
+.ticket .item-left .sce .icon, .ticket .item-left .sce p,
+.ticket .item-left .loc .icon, .ticket .item-left .loc p{
+    float: left;
+    word-spacing: 5px;
+    letter-spacing: 1px;
+    color: #888;
+    margin-bottom: 10px;
+}
+.ticket .item-left .sce .icon, .ticket .item-left .loc .icon {
+  margin-right: 10px;
+  font-size: 20px;
+  color: #666
+}
+
+.ticket button{
+  font-size: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 160px;
+  height: 50px;
+  color: #ddd;
+  background-color: #a5037a;
+}
+
+.ticket button:hover{
+  color: #fff;
+  background-color: #c80394;
+  transform: scale(1);
+}
+
+.ticket .ticket-session{
+  width: 175px;
+  font-weight: bold;
+  color: #760157c2;
+  background-color: #7601577c;
+}
