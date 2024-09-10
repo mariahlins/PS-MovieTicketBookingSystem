@@ -19,7 +19,6 @@ import qrcode
 def index(request):
     return render(request, 'cinemas/index.html')
 
-@login_required
 def tickets(request, sessionId):
     try:
         session=Session.objects.get(id=sessionId)

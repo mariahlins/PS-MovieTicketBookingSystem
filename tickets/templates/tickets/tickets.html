@@ -2,7 +2,10 @@
 {% extends 'cinemas/base.html' %}
 
 {% block content %}
-<h1 style="color: aliceblue;">Ingressos para {{ session.movie.title }} - {{ session.date }}</h1>
+<div style="display: flex; align-items: center; justify-content: center;">
+    <h1 style="color: #ebebeb">Ingressos para {{ session.movie.title }} - {{ session.date }}</h1>
+</div>
+{% if user.is_superuser or user.is_staff %}
 <div class="container">
     <div class="card-container">
         {% for ticket in tickets %}
@@ -23,5 +26,27 @@
         {% endfor %}
     </div>
 </div>
+{% else %}
+<div class="ticket-container">
+    <div class="ticket-card-container">
+        {% for ticket in tickets %}
+        <div class="ticket-card">
+            <h2 style="color:#d2d1d1;">{{ticket.seatNumber}}</h2>
+            {% if ticket.is_reserved %}
+                <h2 style="color: #d2d1d1;">OCUPADO</h2>
+                <svg xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px; margin-right: 8px;" viewBox="0 0 16 16" fill="currentColor" class="bi bi-person-circle"></svg>
+                    <path d="M13.468 12.37C12.758 11.226 11.421 10.5 8 10.5s-4.758.726-5.468 1.87A6.982 6.982 0 0 0 8 15a6.982 6.982 0 0 0 5.468-2.63zM8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                    <path fill-rule="evenodd" d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 13a6 6 0 1 1 0-12 6 6 0 0 1 0 12z"/>
+                </svg>
+            {% else %}
+            <a class="buyticket" href="{% url 'sessionTicket' ticket.id %}">Comprar</a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+{% endif %}
 
 {% endblock %}

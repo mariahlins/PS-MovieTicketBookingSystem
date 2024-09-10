@@ -6,9 +6,9 @@ from .models import Session
 from .forms import FirstStepForm, SecondStepForm
 from django.utils import timezone
 
-@login_required
 def sessions(request):
     today=timezone.now().date()
+    #a linha 12 faz com que apenas sessões válidas (ou seja, que ainda vão acontecer) sejam listadas
     #sessions=Session.objects.filter(date__gte=today).order_by('-date')
     sessions=Session.objects.order_by('-date')
     context={'sessions':sessions}
