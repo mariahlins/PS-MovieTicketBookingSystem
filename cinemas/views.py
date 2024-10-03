@@ -17,6 +17,7 @@ def cinemas(request):
     context={'cinemas':cinemas}
     return render(request, 'cinemas/cinemas.html', context)
 
+# essa função vai retornar o cinema com o id especificado no request
 @login_required
 def cinema(request, cinemaId):
     #tratamento para o caso de o id do cinema não retornar nada
@@ -25,7 +26,7 @@ def cinema(request, cinemaId):
     except Cinema.DoesNotExist:
         return HttpResponseNotFound("Cinema não encontrado")
     
-    #listagem de salas do cinema
+    #listagem de salas do cinema escolhido
     rooms = cinema.room_set.order_by('dateAdded')
     context = {'cinema': cinema, 'rooms': rooms, 'cinemaId': cinemaId}
     return render(request, 'cinemas/cinema.html', context)
@@ -56,7 +57,10 @@ def newCinema(request):
 
 @login_required
 def newRoom(request, cinemaId):
+    # vai funcionar semelhante ao newCinema com exceção do fato de que primeiro temos que pegar o id no request do cinema para adicionar a sala
+    # já que cada sala está associada a um cinema
     try:
+        #vai tentar achar o cinema com o id passado e atribuir à variável cinema
         cinema = Cinema.objects.get(id=cinemaId)
     except Cinema.DoesNotExist:
         return HttpResponseNotFound("Item não encontrado")
@@ -64,10 +68,13 @@ def newRoom(request, cinemaId):
     if request.method == 'POST':
         form = RoomForm(request.POST)
         if form.is_valid():
+            #vai salvar as informações no newRoom e já vai atribuir o cinema para que o usuario nao precise preencher
             newRoom = form.save(commit=False)
             newRoom.cinema = cinema
             try:
+                #vai tentar salvar o novo objeto
                 newRoom.save()
+                #caso salve, irá voltar para tela do cinema do qual a sala foi adicionada
                 return HttpResponseRedirect(reverse('cinema', args=[cinemaId]))
             except IntegrityError:
                 form.add_error(None, "Erro ao salvar. Dados duplicados ou violação de integridade")
@@ -82,14 +89,18 @@ def newRoom(request, cinemaId):
 @login_required
 def editCinema(request, cinemaId):
     try:
+        #procura o cinema que corresponde o id do request e salva na variavel cinema para ser editado
         cinema = Cinema.objects.get(id=cinemaId)
     except Cinema.DoesNotExist:
         return HttpResponseNotFound("Item não encontrado")
 
     if request.method=='POST':
+        #vai completar com as informações do próprio objeto para que o usuario altere o que for necessário e se o metodo
+        #for post, pega as informações que estiverem no form
         form=CinemaForm(instance=cinema, data=request.POST)
         if form.is_valid():
             try:
+                #tenta salvar as alterações
                 form.save()
                 return HttpResponseRedirect(reverse('cinemas'))
             except IntegrityError:
@@ -97,6 +108,7 @@ def editCinema(request, cinemaId):
             except Exception as e:
                     form.add_error(None, f"Erro inesperado: {e}")
     else:
+        #preenche o form com os dados do proprio objeto
         form=CinemaForm(instance=cinema)
     
     context={'cinema':cinema, 'form': form}
@@ -104,14 +116,18 @@ def editCinema(request, cinemaId):
 
 @login_required
 def editRoom(request, roomId):
+    #mesma lógica do editCinema, exceto que não podemos alterar apenas o id do cinema da sala
     room=Room.objects.get(id=roomId)
+    #vai associar o id do cinema associada à sala à variavel 
     cinemaId = room.cinema.id
     try:
+        #procura o cinema da sala que queremos editar
         cinema = Cinema.objects.get(id=cinemaId)
     except Cinema.DoesNotExist:
-        return HttpResponseNotFound("Sala não encontrada")
+        return HttpResponseNotFound("Cinema não encontrado")
 
     if request.method=='POST':
+        #mesma lógica do editCinema
         form=RoomForm(instance=room, data=request.POST)
         if form.is_valid():
             try:
@@ -130,11 +146,13 @@ def editRoom(request, roomId):
 @login_required
 def deleteCinema(request, cinemaId):
     try:
+        #puxa o cinema que corresponde ao Id passado no request
         cinema = Cinema.objects.get(id=cinemaId)
     except Cinema.DoesNotExist:
         return HttpResponseNotFound("Cinema não encontrado")
 
     if request.method == 'POST':
+        #executa o metodo delete
         cinema.delete()
         return HttpResponseRedirect(reverse('cinemas'))
     
@@ -144,10 +162,12 @@ def deleteCinema(request, cinemaId):
 @login_required
 def deleteRoom(request, roomId):
     try:
+        #puxa a sala que é passada no request
         room = Room.objects.get(id=roomId)
     except Room.DoesNotExist:
         return HttpResponseNotFound("Sala não encontrada")
 
+    #puxa o cinema que está associado à sala para usar no HttpResponseRedirect depois
     cinema = room.cinema
 
     if request.method == 'POST':

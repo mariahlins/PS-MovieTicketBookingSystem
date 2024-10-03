@@ -13,6 +13,7 @@ class CinemaForm(forms.ModelForm):
         }
 
 class RoomForm(forms.ModelForm):
+    #não adicionamos o campo de cinema porque ele é preenchido na função newRoom
     class Meta:
         model=Room
         fields=['roomNumber','seats']

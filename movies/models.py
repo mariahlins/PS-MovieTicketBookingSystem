@@ -2,6 +2,7 @@ from django.db import models
 
 class Movie(models.Model):
 
+    #generos pré definidos para facilitar na filtragem dos filmes depois
     GENRES=[
         ('None','None'),
         ('Action','Action'),
