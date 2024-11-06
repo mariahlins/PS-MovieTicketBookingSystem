@@ -1,5 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from abc import ABC, abstractmethod
 import qrcode.constants
+from decimal import Decimal
+from django.utils import timezone
 from .models import Ticket, Session, TicketCancelled, Payment, Coupon
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.urls import reverse
@@ -7,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from users.models import Profile, CreditCard, DebitCard
 from .forms import TicketForm, CouponForm
 from django.db import IntegrityError
+from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.utils.crypto import get_random_string
 from django.core.mail import EmailMessage
@@ -28,46 +32,6 @@ def tickets(request, sessionId):
     tickets=Ticket.objects.filter(session=session)
     context={'session': session, 'tickets': tickets}
     return render(request, 'tickets/tickets.html', context)
-
-@login_required
-def sessionTicket(request, ticketId):
-    try:
-        ticket=Ticket.objects.get(id=ticketId)
-    except Ticket.DoesNotExist:
-        return HttpResponseNotFound("Ticket não encontrado")
-    
-    profile = get_object_or_404(Profile, user=request.user)
-
-    if request.method == 'POST':
-        form = TicketForm(request.POST, instance=ticket)
-        if form.is_valid():
-            coupon_code=form.cleaned_data['coupon_code']
-            ticketType = form.cleaned_data['ticketType']
-            if not ticket.is_reserved:
-                try:
-                    if coupon_code:
-                        try:
-                            coupon=Coupon.objects.get(code=coupon_code, active=True)
-                            if coupon.is_valid():
-                                discount_amount=ticket.price*(coupon.discount/100)
-                                ticket.price-=discount_amount
-                                ticket.coupon=coupon
-                            else:
-                                form.add_error('coupon_code',"Cupom invalido ou expirado")
-                        except Coupon.DoesNotExist:
-                            form.add_error('coupon_code',"Cupom não encontrado")
-
-                    ticket.reserve(profile, ticketType)
-                    return HttpResponseRedirect(reverse('tickets', args=[ticket.session.id]))
-                except IntegrityError:
-                    form.add_error(None, "Erro ao reservar o ingresso. Verifique os dados e tente novamente.")
-                except Exception as e:
-                    form.add_error(None, f"Erro inesperado: {e}")
-    else:
-        form = TicketForm(instance=ticket)
-
-    context = {'ticket': ticket, 'form': form}
-    return render(request, 'tickets/sessionTicket.html', context)
 
 @login_required
 def ticketHistory(request):
@@ -94,6 +58,111 @@ def cancelledTicket(request):
         return HttpResponseNotFound("Ticket não encontrado")
     
     return render(request, 'tickets/cancelledTicket.html', {'ticket_cancelled': ticket_cancelled})
+
+
+#########################
+
+#implementação do template method para reserva de ticket
+
+class TicketReservationTemplate(ABC):
+    def __init__(self, request, ticket, profile):
+        self.request = request
+        self.ticket = ticket
+        self.profile = profile
+        self.form = TicketForm(request.POST or None, instance=self.ticket)
+
+    def process(self):
+        #esse método vai definir o fluxo da reserva do ticket
+        if self.ticket.is_reserved:
+            return self.redirect_with_message('tickets', 'Ticket já reservado', self.ticket.session.id)
+        
+        if self.request.method=='POST' and self.form.is_valid():
+            try:
+                self.apply_coupon()
+                self.reserve_ticket()
+                messages.success(self.request, "Ticket reservado com sucesso!")
+                return self.redirect('tickets', self.ticket.session.id)
+            except Exception as e:
+                self.handle_exception(e)
+        
+        return render(self.request, 'tickets/sessionTickets,html', {'ticket':self.ticket, 'form':self.form})
+    
+    @abstractmethod
+    def apply_coupon(self):
+        pass
+
+    @abstractmethod
+    def reserve_ticket(self):
+        pass
+
+    def handle_exception(self, exception):
+        if isinstance(exception, ValidationError):
+            self.form.add_error(None, str(exception))
+        elif isinstance(exception, IntegrityError):
+            self.form.add_error(None, "Erro ao reservar o ingresso. Verifique os dados e tente novamente.")
+        else:
+            self.form.add_error(None, f"Erro inesperado: {exception}")
+    
+    def redirect_with_message(self, view_name, message, *args):
+        messages.error(self.request, message)
+        return HttpResponseRedirect(reverse(view_name, args=args))
+    
+    def redirect(self, view_name, *args):
+        return HttpResponseRedirect(reverse(view_name, args=args))
+
+class DefaultTicketReservation(TicketReservationTemplate):
+    def apply_coupon(self):
+        coupon_code = self.request.POST.get('coupon_code')
+        if not coupon_code:
+            raise ValidationError("Nenhum código de cupom foi fornecido.")
+        
+        try:
+            coupon = Coupon.objects.get(code=coupon_code, active=True)
+        except Coupon.DoesNotExist:
+            raise ValidationError("O cupom não foi encontrado ou está expirado.")
+        
+        #verifica se está inválido ou expirado
+        if not coupon.is_valid() or coupon.validUntil > timezone.now :
+            raise ValidationError("O cupom está expirado ou inválido.")
+        
+        discount_amount=(self.price * coupon.discount) / Decimal('100.0')
+        self.price=round(self.price - discount_amount, 2)
+        self.coupon=coupon
+        self.save()
+
+
+    def reserve_ticket(self):
+        ticket_type = self.request.POST.get('ticket_type')
+
+        if ticket_type not in dict(Ticket.TICKET_TYPES):
+            raise ValidationError("Tipo de ticket inválido. Tente novamente.")
+        
+        self.ticket.user = self.profile
+        self.ticket.is_reserved = True
+        self.ticket.ticketType = ticket_type
+        self.ticket.staty = 'PENDING'
+
+        base_price = self.ticket.price
+        if ticket_type == 'MEIA':
+            self.price = round(base_price * Decimal('0.5'), 2)
+        elif ticket_type == 'IDOSO':
+            self.price = round(base_price * Decimal('0.6'), 2)
+
+        self.ticket.save()
+        
+
+@login_required
+def sessionTicket(request, ticketId):
+    try:
+        ticket=Ticket.objects.get(id=ticketId)
+    except Ticket.DoesNotExist:
+        return HttpResponseNotFound("Ticket não encontrado")
+    
+    profile = get_object_or_404(Profile, user=request.user)
+
+    reservation = DefaultTicketReservation(request, ticket, profile)
+    return reservation.process()
+
 
 @login_required
 def cancelTicket(request, ticket_id):

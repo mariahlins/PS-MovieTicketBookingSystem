@@ -3,6 +3,7 @@ from users.models import Profile
 from sessoes.models import Session
 from decimal import Decimal
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 class Coupon(models.Model):
     code=models.CharField(max_length=30, unique=True)
@@ -50,6 +51,7 @@ class Ticket(models.Model):
             self.is_reserved = True
             self.ticketType = ticketType
             basePrice=self.price
+
             if self.status=='FREE':
                 self.status = 'PENDING'
 
@@ -86,18 +88,24 @@ class Ticket(models.Model):
             raise ValueError("O ticket não pode ser cancelado.")
         
     def apply_coupon(self, coupon_code):
+        #vai verificando por etapas a validade e a existência do cupom
+        if not coupon_code:
+            return ValidationError("Código de cupom não existente ou inválido.")
+
         try:
-            coupon=Coupon.objects.get(code=coupon_code)
-            if coupon.is_valid():
-                self.coupon=coupon
-                discount_amount=(self.price * coupon.discount) / Decimal('100.0')
-                self.price=round(self.price - discount_amount, 2)
-                self.save()
-            else:
-                raise ValueError("Cupom inválido ou expirado.")
+            coupon=Coupon.objects.get(code=coupon_code, active=True)
         except Coupon.DoesNotExist:
             raise ValueError("Cupom não encontrado.")
         
+        if not coupon.is_valid():
+            raise ValidationError("O cupom está inválido ou expirado.")
+        
+        discount_amount=(self.price * coupon.discount) / Decimal('100.0')
+        self.price=round(self.price - discount_amount, 2)
+        self.coupon=coupon
+        self.save()
+        
+        return self.price
 
 class TicketCancelled(models.Model):
     original_ticket_id=models.PositiveIntegerField()
