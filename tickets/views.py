@@ -85,7 +85,7 @@ class TicketReservationTemplate(ABC):
             except Exception as e:
                 self.handle_exception(e)
         
-        return render(self.request, 'tickets/sessionTickets,html', {'ticket':self.ticket, 'form':self.form})
+        return render(self.request, 'tickets/sessionTicket.html', {'ticket':self.ticket, 'form':self.form})
     
     @abstractmethod
     def apply_coupon(self):
@@ -114,42 +114,51 @@ class DefaultTicketReservation(TicketReservationTemplate):
     def apply_coupon(self):
         coupon_code = self.request.POST.get('coupon_code')
         if not coupon_code:
-            raise ValidationError("Nenhum código de cupom foi fornecido.")
+            return
         
         try:
             coupon = Coupon.objects.get(code=coupon_code, active=True)
         except Coupon.DoesNotExist:
             raise ValidationError("O cupom não foi encontrado ou está expirado.")
         
-        #verifica se está inválido ou expirado
-        if not coupon.is_valid() or coupon.validUntil > timezone.now :
+        # Verifica se o cupom está inválido ou expirado
+        if not coupon.is_valid() or coupon.validUntil < timezone.now():
             raise ValidationError("O cupom está expirado ou inválido.")
         
-        discount_amount=(self.price * coupon.discount) / Decimal('100.0')
-        self.price=round(self.price - discount_amount, 2)
-        self.coupon=coupon
-        self.save()
-
+        # Cálculo do desconto baseado no preço atual do ticket
+        discount_amount = (self.ticket.price * coupon.discount) / Decimal('100.0')
+        discounted_price = round(self.ticket.price - discount_amount, 2)
+        self.ticket.price = discounted_price  # Atualiza o preço do ticket com desconto
+        self.ticket.coupon = coupon
+        self.ticket.save()
 
     def reserve_ticket(self):
-        ticket_type = self.request.POST.get('ticket_type')
-
-        if ticket_type not in dict(Ticket.TICKET_TYPES):
+        ticket_type = self.request.POST.get('ticketType')
+        print("Valor do tipo de ticket recebido:", ticket_type)
+        
+        # Verificar se o tipo de ticket é válido
+        valid_ticket_types = [key for key, _ in Ticket.TICKET_TYPES]
+        if ticket_type not in valid_ticket_types:
             raise ValidationError("Tipo de ticket inválido. Tente novamente.")
         
+        # Configurações básicas do ticket
         self.ticket.user = self.profile
         self.ticket.is_reserved = True
         self.ticket.ticketType = ticket_type
-        self.ticket.staty = 'PENDING'
-
-        base_price = self.ticket.price
-        if ticket_type == 'MEIA':
-            self.price = round(base_price * Decimal('0.5'), 2)
-        elif ticket_type == 'IDOSO':
-            self.price = round(base_price * Decimal('0.6'), 2)
-
-        self.ticket.save()
+        self.ticket.status = 'PENDING'
         
+        # Define o preço do ticket baseado no tipo, com valor padrão
+        base_price = self.ticket.price
+        discounted_price = base_price  # valor padrão
+
+        if ticket_type == 'MEIA':
+            discounted_price = round(base_price * Decimal('0.5'), 2)
+        elif ticket_type == 'IDOSO':
+            discounted_price = round(base_price * Decimal('0.6'), 2)
+        
+        self.ticket.price = discounted_price 
+        self.ticket.save()
+
 
 @login_required
 def sessionTicket(request, ticketId):
@@ -163,6 +172,95 @@ def sessionTicket(request, ticketId):
     reservation = DefaultTicketReservation(request, ticket, profile)
     return reservation.process()
 
+#######################
+# implementação do strategy para meios de pagamento
+
+class PaymentStrategy(ABC):
+    @abstractmethod
+    def pay(self, request, ticket, profile):
+        pass
+    
+    def create_payment(self, ticket, amount, pay_method):
+        payment = Payment.objects.create(
+            ticket=ticket,
+            amount=amount,
+            payMethod=pay_method,
+            status='COMPLETED',
+            transactionId=get_random_string(20)
+        )
+
+class WalletPayment(PaymentStrategy):
+    def pay(self, request, ticket, profile):
+        wallet = profile.wallet
+        if wallet.balance >= ticket.price:
+            wallet.deduct_balance(ticket.price)
+            return self.create_payment(ticket, ticket.price, 'WALLET')
+        else:
+            raise ValueError("Saldo insuficiente na carteira.")
+
+class CreditCardPayment(PaymentStrategy):
+    def pay(self, request, ticket, profile):
+        card_id = request.POST.get('card_id')
+        card = profile.wallet.credit_cards.filter(id=card_id).first()
+        if not card:
+            raise ValueError("Cartão de crédito não encontrado ou inválido.")
+        
+        return self.create_payment(ticket, ticket.price, 'CREDIT_CARD')
+    
+class DebitCardPayment(PaymentStrategy):
+    def pay(self, request, ticket, profile):
+        card_id = request.POST.get('card_id')
+        card = profile.wallet.debit_cards.filter(id=card_id).first()
+        if not card:
+            raise ValueError("Cartão de débito não encontrado ou inválido.")
+        
+        return self.create_payment(ticket, ticket.price, 'DEBIT_CARD')
+    
+class PixPayment(PaymentStrategy):
+    def pay(self, request, ticket, profile):
+        return self.create_payment(ticket, ticket.price, 'PIX')
+
+@login_required
+def payTicket(request, ticket_id):
+    try:
+        ticket = Ticket.objects.get(id=ticket_id)
+    except Ticket.DoesNotExist:
+        return HttpResponseNotFound("Ticket não encontrado")
+    
+    if ticket.paid:
+        messages.error(request,"O pagamento já foi efetuado.")
+        return HttpResponseRedirect(reverse('ticketHistory'))
+    
+    profile = request.user.profile
+    payment_method = request.POST.get('payment_method')
+    strategy = None
+
+    if payment_method == 'WALLET':
+        strategy = WalletPayment()
+    elif payment_method == 'CREDIT_CARD':
+        strategy = CreditCardPayment()
+    elif payment_method == 'DEBIT_CARD':
+        strategy = DebitCardPayment()
+    elif payment_method == 'PIX':
+        strategy = PixPayment()
+    else:
+        messages.error(request, "Método de pagamento inválido.")
+        return HttpResponseRedirect(reverse('payTicket', args=[ticket.id]))
+
+    try:
+        payment = strategy.pay(request, ticket, profile)
+        sendTicketEmail(request.user,ticket,payment)
+        messages.success(request,"Pagamento concluído com sucesso!")
+        return HttpResponseRedirect(reverse('ticketHistory'))
+    except ValueError as e:
+        messages.error(request, str(e))
+    except Exception as e:
+        messages.error(request, f"Erro inesperado: {e}")
+
+    context={'ticket':ticket,'wallet_balance':profile.wallet.balance,'credit_cards':profile.wallet.credit_cards.all(), 'debit_cards':profile.wallet.debit_cards.all()}
+    return render(request, 'tickets/payTicket.html', context)
+
+####################
 
 @login_required
 def cancelTicket(request, ticket_id):
@@ -181,106 +279,6 @@ def cancelTicket(request, ticket_id):
         messages.error(request, 'Você não tem permissão para cancelar este ticket.')
 
     return redirect('ticketHistory')
-
-@login_required
-def payTicket(request, ticket_id):
-    try:
-        ticket = Ticket.objects.get(id=ticket_id)
-    except Ticket.DoesNotExist:
-        return HttpResponseNotFound("Ticket não encontrado")
-    
-    if ticket.paid:
-        messages.error(request,"O pagamento já foi efetuado.")
-        return HttpResponseRedirect(reverse('ticketHistory'))
-    
-    profile = request.user.profile
-    wallet = profile.wallet
-
-    if request.method=='POST':
-        payment_method=request.POST.get('payment_method')
-
-        if payment_method=='WALLET':
-            if wallet.balance>=ticket.price:
-                wallet.deduct_balance(ticket.price)
-                payment=Payment.objects.create(
-                    ticket=ticket,
-                    amount=ticket.price,
-                    payMethod='WALLET',
-                    status='COMPLETED',
-                    transactionId=get_random_string(20)
-                )
-
-                ticket.paid=True
-                ticket.status='DONE'
-                ticket.save()
-                sendTicketEmail(request.user,ticket,payment)
-                messages.success(request, "Pagamento concluído com sucesso.")
-                return HttpResponseRedirect(reverse('ticketHistory'))
-            else:
-                messages.error(request,"Saldo insuficiente.")
-
-        elif payment_method=='CREDIT_CARD':
-            card_id=request.POST.get('card_id')
-            try:
-                card=CreditCard.objects.get(id=card_id)
-            except CreditCard.DoesNotExist:
-                return HttpResponseNotFound("Cartão não encontrado.")
-            
-            payment=Payment.objects.create(
-                ticket=ticket,
-                amount=ticket.price,
-                payMethod='CREDIT_CARD',
-                status='COMPLETED',
-                transactionId=get_random_string(20)
-            )
-            ticket.paid=True
-            ticket.status='DONE'
-            ticket.save()
-            sendTicketEmail(request.user,ticket,payment)
-            messages.success(request,"Pagamento concluído com sucesso usando cartão de crédito.")
-            return HttpResponseRedirect(reverse('ticketHistory'))
-
-        elif payment_method=='DEBIT_CARD':
-            card_id=request.POST.get('card_id')
-            try:
-                card=DebitCard.objects.get(id=card_id)
-            except CreditCard.DoesNotExist:
-                return HttpResponseNotFound("Cartão não encontrado.")
-            
-            payment=Payment.objects.create(
-                ticket=ticket,
-                amount=ticket.price,
-                payMethod='CREDIT_CARD',
-                status='COMPLETED',
-                transactionId=get_random_string(20)
-            )
-            ticket.paid=True
-            ticket.status='DONE'
-            ticket.save()
-            sendTicketEmail(request.user,ticket,payment)
-            messages.success(request,"Pagamento concluído com sucesso usando cartão de debito.")
-            return HttpResponseRedirect(reverse('ticketHistory'))
-
-        elif payment_method=='PIX':     
-            payment=Payment.objects.create(
-                ticket=ticket,
-                amount=ticket.price,
-                payMethod='PIX',
-                status='COMPLETED',
-                transactionId=get_random_string(20)
-            )
-            ticket.paid=True
-            ticket.status='DONE'
-            ticket.save()
-            sendTicketEmail(request.user,ticket,payment)
-            messages.success(request,"Pagamento concluído com sucesso usando pix.")
-            return HttpResponseRedirect(reverse('ticketHistory'))
-        
-        else:
-            messages.error(request,"Metódo de pagamento inválido ou falha no pagamento.")
-
-    context={'ticket':ticket,'wallet_balance':wallet.balance,'credit_cards':wallet.credit_cards.all(), 'debit_cards':wallet.debit_cards.all()}
-    return render(request, 'tickets/payTicket.html', context)
 
 @login_required
 def coupons(request):
