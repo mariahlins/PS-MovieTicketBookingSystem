@@ -188,6 +188,10 @@ class PaymentStrategy(ABC):
             status='COMPLETED',
             transactionId=get_random_string(20)
         )
+        ticket.paid=True
+        ticket.status='DONE'
+        ticket.save()
+        return payment
 
 class WalletPayment(PaymentStrategy):
     def pay(self, request, ticket, profile):
@@ -245,7 +249,13 @@ def payTicket(request, ticket_id):
         strategy = PixPayment()
     else:
         messages.error(request, "Método de pagamento inválido.")
-        return HttpResponseRedirect(reverse('payTicket', args=[ticket.id]))
+        context = {
+            'ticket': ticket,
+            'wallet_balance': profile.wallet.balance,
+            'credit_cards': profile.wallet.credit_cards.all(),
+            'debit_cards': profile.wallet.debit_cards.all()
+        }
+        return render(request, 'tickets/payTicket.html', context)
 
     try:
         payment = strategy.pay(request, ticket, profile)
