@@ -10,6 +10,7 @@ from django.db import IntegrityError
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from .movie_system import MovieSystem
 
 #listar todos os filmes cadastrados
 def movies(request):
@@ -33,24 +34,8 @@ def movie(request, movieId):
 
 @login_required
 def newmovie(request):
-    if request.method!='POST':
-        form=MovieForm()
-    else:
-        #se o metodo for post, executa as seguintes linhas
-        form=MovieForm(request.POST)
-        #verifica se o form é valido (ex.: verifica se não tem nenhum campo em branco)
-        if form.is_valid():
-            try:
-                #tenta salvar as informações
-                form.save()
-                return HttpResponseRedirect(reverse('movies'))
-            except IntegrityError:
-                form.add_error(None, "Erro ao salvar o formulário. Dados duplicados ou violação de integridade.")
-            except Exception as e:
-                    form.add_error(None, f"Erro inesperado: {e}")
-
-    context={'form':form}
-    return render(request, 'movies/newmovie.html', context)
+    movie_system = MovieSystem()
+    return movie_system.add_movie(request)
 
 @login_required
 def deleteMovie(request, movieId):

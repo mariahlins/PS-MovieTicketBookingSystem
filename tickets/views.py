@@ -19,6 +19,7 @@ from django.utils.html import strip_tags
 from io import BytesIO
 from django.core.files.base import ContentFile
 import qrcode
+from .reservation_system import ReservationSystem
 
 def index(request):
     return render(request, 'cinemas/index.html')
@@ -168,9 +169,9 @@ def sessionTicket(request, ticketId):
         return HttpResponseNotFound("Ticket não encontrado")
     
     profile = get_object_or_404(Profile, user=request.user)
+    reservation_system = ReservationSystem()
 
-    reservation = DefaultTicketReservation(request, ticket, profile)
-    return reservation.process()
+    return reservation_system.create_reservation(request, ticketId, profile)
 
 #######################
 # implementação do strategy para meios de pagamento
