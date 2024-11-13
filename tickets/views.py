@@ -19,6 +19,7 @@ from django.utils.html import strip_tags
 from io import BytesIO
 from django.core.files.base import ContentFile
 import qrcode
+from .observers import Subject, TicketEmailObserver
 
 def index(request):
     return render(request, 'cinemas/index.html')
@@ -237,7 +238,12 @@ def payTicket(request, ticket_id):
     
     profile = request.user.profile
     payment_method = request.POST.get('payment_method')
+    #strategy
     strategy = None
+    #observer
+    subject = Subject()
+    email_observer = TicketEmailObserver()
+    subject.register_observer(email_observer)
 
     if payment_method == 'WALLET':
         strategy = WalletPayment()
@@ -259,8 +265,9 @@ def payTicket(request, ticket_id):
 
     try:
         payment = strategy.pay(request, ticket, profile)
-        sendTicketEmail(request.user,ticket,payment)
-        messages.success(request,"Pagamento concluído com sucesso!")
+        # Notificação do observer quando o pagamento é concluído
+        subject.notify_observers(ticket, 'payment_completed')
+        messages.success(request, "Pagamento concluído com sucesso!")
         return HttpResponseRedirect(reverse('ticketHistory'))
     except ValueError as e:
         messages.error(request, str(e))
@@ -332,33 +339,3 @@ def editCoupon(request, coupon_id):
         form=CouponForm(instance=coupon)
     
     return render(request, 'tickets/editCoupon.html', {'coupon':coupon, 'form':form})
-
-def sendTicketEmail(user, ticket, payment):
-    qrData=f"Ticket ID:{ticket.id}, Sessão: {ticket.session.movie.title}, Hora: {ticket.session.hour},Assento: {ticket.seatNumber}"
-    qr=qrcode.QRCode(
-        version=1, error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10, border=4
-    )
-
-    qr.add_data(qrData)
-    qr.make(fit=True)
-
-    img=qr.make_image(fill='black', back_color='white')
-    buffer=BytesIO()
-    img.save(buffer, format="PNG")
-    buffer.seek(0)
-    qrCodeImage=ContentFile(buffer.read(), name=f'ticket_{ticket.id}_qrcode.png')
-
-    context={'user':user,'ticket':ticket,'payment':payment}
-    htmlContent=render_to_string('tickets/ticketConfirmation.html', context)
-    textContent=strip_tags(htmlContent)
-
-    email=EmailMessage(
-        subject=f"Confirmação de Pagamento e Ticket - {ticket.session.movie.title}",
-        body=textContent,
-        from_email='cinepass.p3@gmail.com',
-        to=[user.email],
-    )
-    email.attach(qrCodeImage.name, qrCodeImage.read(), 'image/png')
-    email.content_subtype='html'
-    email.send()
